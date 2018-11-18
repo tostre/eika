@@ -24,6 +24,7 @@ class newCharacter:
         # Die "Höhe der Emotion von 0 bis 1"
         # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
 
+    #tet
 
 
 

@@ -26,12 +26,13 @@ class newFrame:
         # modify ui
         self.root.title(cbName)
         self.root.resizable(0,0)
-        self.button = tk.Button(self.root, text="Send", command=self.updateChatOut)
-        self.chatIn.bind('<Return>', self.hitEnter)
+        self.button = tk.Button(self.root, text="Send", command=self.handleInput)
+        self.chatIn.bind('<Return>', self.handleInput)
         self.chatIn.focus_set()
+        self.chatOut.config(width=60)
         self.chatOut.configure(state="disabled")
         self.log.configure(state="disabled")
-        self.log.configure(width=40)
+        self.log.configure(width=60)
         self.debug.config(width=40)
         self.debug.configure(state="disabled")
         # build layout
@@ -48,24 +49,36 @@ class newFrame:
         self.updateDebug(self.result)
 
 
-    # bidns the enter key to updateChatOut
-    def hitEnter(self, event):
-        self.updateChatOut()
+    ##
+    #   These methods take the input, sent it to the bot and print the response
+    ##
+
+    def handleInput(self, event):
+        # prüft ob in dem string was drinsteht
+        self.input = self.chatIn.get()
+        if self.input:
+            self.updateChatOut(self.input)
+            self.updateLog(self.input)
 
     # called when button is clicked/enter pressed, handles in/output
-    def updateChatOut(self):
-        self.input = self.chatIn.get()
-        # prüft ob in dem string was drinsteht
-        if input:
-            # prints input, empties input field
-            self.chatOut.configure(state="normal")
-            self.chatOut.insert(tk.END, "Du: " + self.input + "\n")
-            self.chatOut.see(tk.END)
-            # deletes text from index 0 till the end in input filed
-            self.chatIn.delete(0, tk.END)
-            # inserts chatbot answer in chat
-            self.chatOut.insert(tk.END, self.cbName + ": " + self.bot.respond(self.input) + "\n")
-            self.chatOut.configure(state="disabled")
+    def updateChatOut(self, input):
+        # prints input, empties input field
+        self.chatOut.configure(state="normal")
+        self.chatOut.insert(tk.END, "Du: " + input + "\n")
+        self.chatOut.see(tk.END)
+        # deletes text from index 0 till the end in input filed
+        self.chatIn.delete(0, tk.END)
+        # inserts chatbot answer in chat
+        self.chatOut.insert(tk.END, self.cbName + ": " + self.bot.respond(input) + "\n")
+        self.chatOut.configure(state="disabled")
+
+    # prints to the log widget, used to display additional text data (sentiment etc)
+    def updateLog(self, input):
+        # unlock widget, inster, lock widget
+        self.log.configure(state="normal")
+        self.log.delete(1.0, tk.END)
+        self.log.insert(tk.END, self.bot.getTopics(input).__str__() + "\n")
+        self.log.configure(state="disabled")
 
     # prints to the debug widget
     def updateDebug(self, debug):
@@ -76,11 +89,6 @@ class newFrame:
         self.debug.configure(state="normal")
         self.debug.insert(tk.END, time + ": " + debug + "\n")
         self.debug.configure(state="disabled")
-
-    # prints to the log widget
-    # used to display additional text data (sentiment etc)
-    def updateLog(self, log):
-        pass
 
     def show(self):
         self.root.mainloop()

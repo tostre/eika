@@ -1,8 +1,10 @@
 import chatterbot as cb
+import empath
 
 class newBot:
     # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
     def __init__(self, name, character):
+        self.lexicon = empath.Empath()
         self.name = name
         self.character = character
         self.bot = cb.ChatBot(
@@ -11,22 +13,32 @@ class newBot:
         )
 
     def train(self):
-        self.bot.train([
-            "Hi, can I help you?",
-            "Sure, I'd like to book a flight to Iceland.",
-            "Your flight has been booked."
-        ])
+        #self.bot.train([
+        #    "Hi, can I help you?",
+        #    "Sure, I'd like to book a flight to Iceland.",
+        #    "Your flight has been booked."
+        #])
+        self.bot.train("chatterbot.corpus.english")
         print("Training complete")
         return "Training complete"
 
-    def respondWithStatement(self, input):
-        self.output = str(self.bot.get_response(input))
-        print("input: " + input)
-        print("output: " + self.output)
-        return self.output
-
+    # returns chatbot response
     def respond(self, input):
-        self.output = self.bot.get_response(input).__str__()
-        print("input 'text': " + input)
-        print("output 'text': " + self.output)
-        return self.output
+        return self.bot.get_response(input).__str__()
+
+    # analyzes and returns topics of the input using empath
+    def getTopics(self, input):
+        print("topics: " + self.lexicon.analyze(input, normalize=True).__str__())
+        # returns topics as a list/set
+        return self.lexicon.analyze(input, normalize=True)
+
+    # analyzes and returns emotions of the input
+    # muss hier noch ein richtiges tool finden
+    # vlt den prof fragen
+    def getEmotions(self):
+        pass
+
+
+
+
+

@@ -1,6 +1,17 @@
 import frame
 import bot
 import character
+import empath
+
+
+em = empath.Empath
+#ana = em.analyze(self, "he hit the other person",categories=None,tokenizer="default",normalize=False)
+#print(ana)
+
+lexicon = empath.Empath()
+cat = lexicon.analyze("This is the speech i'm trying to anlyze", normalize=True)
+print("cat: " + cat.__str__())
+print("cat office: " + str(cat["office"]))
 
 # dicts for traits and emotions
 # TODO: Regeln implementieren:
