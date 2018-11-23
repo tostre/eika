@@ -3,10 +3,11 @@ import empath
 
 class newBot:
     # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
-    def __init__(self, name, character):
+    def __init__(self, name, character, categories):
         self.lexicon = empath.Empath()
         self.name = name
         self.character = character
+        self.categories = categories
         self.bot = cb.ChatBot(
             'EIKA',
             trainer='chatterbot.trainers.ListTrainer'
@@ -28,9 +29,8 @@ class newBot:
 
     # analyzes and returns topics of the input using empath
     def getTopics(self, input):
-        print("topics: " + self.lexicon.analyze(input, normalize=True).__str__())
         # returns topics as a list/set
-        return self.lexicon.analyze(input, normalize=True)
+        return self.lexicon.analyze(input, normalize=True, categories=self.categories)
 
     # analyzes and returns emotions of the input
     # muss hier noch ein richtiges tool finden

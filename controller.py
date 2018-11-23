@@ -3,7 +3,6 @@ import bot
 import character
 import empath
 
-
 em = empath.Empath
 #ana = em.analyze(self, "he hit the other person",categories=None,tokenizer="default",normalize=False)
 #print(ana)
@@ -24,9 +23,11 @@ a = {"trait": 0.2, "val": 0.2, "maxVal": 0.4, "actVal": 0.5}
 f = {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7}
 d = {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
 
+categories=["joy", "sadness", "anger", "fear", "disguist"]
+
 character = character.newCharacter(h, s, a, f, d)
 botName = "EIKA"
-bot = bot.newBot(botName, character)
+bot = bot.newBot(botName, character, categories)
 bot.train()
 
 frame = frame.newFrame(botName, bot)

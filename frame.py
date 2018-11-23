@@ -77,7 +77,14 @@ class newFrame:
         # unlock widget, inster, lock widget
         self.log.configure(state="normal")
         self.log.delete(1.0, tk.END)
-        self.log.insert(tk.END, self.bot.getTopics(input).__str__() + "\n")
+        # print out emototional relevant word counts (normalized)
+        self.topics = self.bot.getTopics(input)
+        self.log.insert(tk.END, "Input topics analysis:" + "\n")
+        self.log.insert(tk.END, "happiness: " + self.topics["joy"].__str__() + "\n")
+        self.log.insert(tk.END, "sadness: " + self.topics["sadness"].__str__() + "\n")
+        self.log.insert(tk.END, "anger: " + self.topics["anger"].__str__() + "\n")
+        self.log.insert(tk.END, "fear: " + self.topics["fear"].__str__() + "\n")
+        self.log.insert(tk.END, "disguist: " + self.topics["disguist"].__str__() + "\n")
         self.log.configure(state="disabled")
 
     # prints to the debug widget
