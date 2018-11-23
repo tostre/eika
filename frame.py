@@ -53,6 +53,7 @@ class newFrame:
     #   These methods take the input, sent it to the bot and print the response
     ##
 
+
     def handleInput(self, event):
         # prüft ob in dem string was drinsteht
         self.input = self.chatIn.get()
