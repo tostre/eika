@@ -58,6 +58,8 @@ class newFrame:
         # prüft ob in dem string was drinsteht
         self.input = self.chatIn.get()
         if self.input:
+            self.response = self.bot.respond(input)
+
             self.updateChatOut(self.input)
             self.updateLog(self.input)
 
@@ -80,12 +82,8 @@ class newFrame:
         self.log.delete(1.0, tk.END)
         # print out emototional relevant word counts (normalized)
         self.topics = self.bot.getTopics(input)
-        self.log.insert(tk.END, "Input topics analysis:" + "\n")
-        self.log.insert(tk.END, "happiness: " + self.topics["joy"].__str__() + "\n")
-        self.log.insert(tk.END, "sadness: " + self.topics["sadness"].__str__() + "\n")
-        self.log.insert(tk.END, "anger: " + self.topics["anger"].__str__() + "\n")
-        self.log.insert(tk.END, "fear: " + self.topics["fear"].__str__() + "\n")
-        self.log.insert(tk.END, "disguist: " + self.topics["disguist"].__str__() + "\n")
+        for item in self.topics:
+            self.log.insert(tk.END, item + "\n")
         self.log.configure(state="disabled")
 
     # prints to the debug widget
