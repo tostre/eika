@@ -1,35 +1,45 @@
 import frame
 import bot
 import character
-import empath
 
-em = empath.Empath
-#ana = em.analyze(self, "he hit the other person",categories=None,tokenizer="default",normalize=False)
-#print(ana)
 
-lexicon = empath.Empath()
-cat = lexicon.analyze("This is the speech i'm trying to anlyze", normalize=True)
-print("cat: " + cat.__str__())
-print("cat office: " + str(cat["office"]))
+class newController:
+    def __init__(self, name):
+        # intialize chat variables
+        self.response = None
+        self.logmessage = None
 
-# dicts for traits and emotions
-# TODO: Regeln implementieren:
-# val ist bei initiierung immer = trait
-# val darf nie höher sein als maxVal
-# alle werte gehen von 0 bis 1
-h = {"trait": 0.3, "val": 0.3, "maxVal": 0.9, "actVal": 0.3}
-s = {"trait": 0.1, "val": 0.1, "maxVal": 0.7, "actVal": 0.2}
-a = {"trait": 0.2, "val": 0.2, "maxVal": 0.4, "actVal": 0.5}
-f = {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7}
-d = {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
+        # initialize character parameters
+        self.h = set()
+        self.s = set()
+        self.a = set()
+        self.f = set()
+        self.d = set()
+        self.character = character.newCharacter(
+            {"trait": 0.3, "val": 0.3, "maxVal": 0.9, "actVal": 0.3},
+            {"trait": 0.1, "val": 0.1, "maxVal": 0.7, "actVal": 0.2},
+            {"trait": 0.2, "val": 0.2, "maxVal": 0.4, "actVal": 0.5},
+            {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7},
+            {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
+        )
+        self.categories = ["joy", "sadness", "anger", "fear", "disguist"]
+        self.bot = bot.newBot(name, self.character, self.categories)
+        self.bot.train()
 
-categories=["joy", "sadness", "anger", "fear", "disguist"]
+        self.frame = frame.newFrame(name, self.bot)
+        self.frame.register(self)
+        self.frame.show()
 
-character = character.newCharacter(h, s, a, f, d)
-botName = "EIKA"
-bot = bot.newBot(botName, character, categories)
-bot.train()
+    def handle_input(self, input):
+        # get response statement from bot
+        self.response = self.bot.respond(input)
+        # analyze input for topics
+        self.logmessage = self.bot.analyze_topics(input)
+        # get confidence for generated response
+        self.logmessage.append("\nresponse confidence: " + self.response.confidence.__str__())
+        # update widgets
+        self.frame.updateChatOut(input, self.response.__str__())
+        self.frame.updateLog(self.logmessage)
 
-frame = frame.newFrame(botName, bot)
-frame.show()
 
+controller = newController("EIKA")

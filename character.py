@@ -5,12 +5,11 @@ class newCharacter:
         self.a = a
         self.f = f
         self.d = d
-        print("Character created")
-        print(str("h: trait: " + str(h["trait"]) + ", val: " + str(h["val"]) + ", maxVal: " + str(h["maxVal"]) + ", actVal: " + str(h["actVal"])))
-        print(str("s: trait: " + str(s["trait"]) + ", val: " + str(s["val"]) + ", maxVal: " + str(s["maxVal"]) + ", actVal: " + str(s["actVal"])))
-        print(str("a: trait: " + str(a["trait"]) + ", val: " + str(a["val"]) + ", maxVal: " + str(a["maxVal"]) + ", actVal: " + str(a["actVal"])))
-        print(str("f: trait: " + str(f["trait"]) + ", val: " + str(f["val"]) + ", maxVal: " + str(f["maxVal"]) + ", actVal: " + str(f["actVal"])))
-        print(str("d: trait: " + str(d["trait"]) + ", val: " + str(d["val"]) + ", maxVal: " + str(d["maxVal"]) + ", actVal: " + str(d["actVal"])))
+        print("h: " + self.h.__str__())
+        print("s: " + self.s.__str__())
+        print("a: " + self.a.__str__())
+        print("f: " + self.f.__str__())
+        print("d: " + self.d.__str__())
 
     def updateEmotion(self, emotion, newVal):
         pass
@@ -24,16 +23,10 @@ class newCharacter:
         # Die "Höhe der Emotion von 0 bis 1"
         # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
 
-    #tet
-
-
-
-
-
 # sentiment analysis
 # liu et al 2003
-#(SVOO-Modell) wandelt einen OMCS-Satz in Frame und zugehörigen Vektor um. Frame enthält alle für die Aussagen des Satzes relevanten Wörter
-#und der Vektor beschreibt den in diesem Satz ausgedrückten Affekt (Bsp.: (happy: 0, sad: 0, anger: 0, fear: 1.0, disgust: 0, surprise: 0)
+# (SVOO-Modell) wandelt einen OMCS-Satz in Frame und zugehörigen Vektor um. Frame enthält alle für die Aussagen des Satzes relevanten Wörter
+# und der Vektor beschreibt den in diesem Satz ausgedrückten Affekt (Bsp.: (happy: 0, sad: 0, anger: 0, fear: 1.0, disgust: 0, surprise: 0)
 
 # stimmungen
 # emotionen
@@ -88,7 +81,7 @@ class newCharacter:
 # bestimmt wie schnell sich diese Stimmungen aufbauen und wieder verfliegen können. Ein Charakter, der sehr hohe Wert in allen
 # drei Dimensionen hat, kann starke positive und negative Stimmungen haben, die sich aber sehr schnell ändern können, wie bei
 # einem Menschen mit starken Stimmungsschwankungen.
-#Stimmungen entwickeln sich hier durch kumulierte emotionale Zustände
+# Stimmungen entwickeln sich hier durch kumulierte emotionale Zustände
 #
 # EISMAN et al
 # Eisman et al. haben es sich im Rahmen eines Forschungsprojektes, das die Entwicklung eines virtuellen Patienten zur Ausbildung

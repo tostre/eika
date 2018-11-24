@@ -1,6 +1,7 @@
 import tkinter as tk
 import datetime
 
+
 class newFrame:
     def __init__(self, cbName, bot):
         self.cbName = cbName
@@ -15,76 +16,76 @@ class newFrame:
         self.filemenu.add_command(label="Edit bot mood")
         self.filemenu.add_command(label="Edit bot emotions")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Retrain chatbot", command=self.retrainBot)
+        self.filemenu.add_command(label="Retrain chatbot", command=self.retrain_bot)
         self.menubar.add_cascade(label="Configure", menu=self.filemenu)
         # create interactive widgets
-        self.info = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
-        self.chatOut = tk.Text(self.root)
-        self.chatIn = tk.Entry(self.root)
-        self.debug = tk.Text(self.root)
-        self.log = tk.Text(self.root)
+        self.infoLabel = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
+        self.chatOutWidget = tk.Text(self.root)
+        self.chatInWidget = tk.Entry(self.root)
+        self.debugWidget = tk.Text(self.root)
+        self.logWidget = tk.Text(self.root)
         # modify ui
         self.root.title(cbName)
-        self.root.resizable(0,0)
-        self.button = tk.Button(self.root, text="Send", command=self.handleInput)
-        self.chatIn.bind('<Return>', self.handleInput)
-        self.chatIn.focus_set()
-        self.chatOut.config(width=60)
-        self.chatOut.configure(state="disabled")
-        self.log.configure(state="disabled")
-        self.log.configure(width=60)
-        self.debug.config(width=40)
-        self.debug.configure(state="disabled")
+        self.root.resizable(0, 0)
+        self.button = tk.Button(self.root, text="Send", command=self.notify_controller)
+        self.chatInWidget.bind('<Return>', self.notify_controller)
+        self.chatInWidget.focus_set()
+        self.chatOutWidget.config(width=60)
+        self.chatOutWidget.configure(state="disabled")
+        self.logWidget.configure(state="disabled")
+        self.logWidget.configure(width=60)
+        self.debugWidget.config(width=40)
+        self.debugWidget.configure(state="disabled")
         # build layout
         self.root.configure(menu=self.menubar)
-        self.chatOut.grid(row=1, column=1, columnspan=2)
-        self.log.grid(row=1, column=3)
-        self.chatIn.grid(row=2, column=1, sticky=tk.W + tk.E)
+        self.chatOutWidget.grid(row=1, column=1, columnspan=2)
+        self.logWidget.grid(row=1, column=3)
+        self.chatInWidget.grid(row=2, column=1, sticky=tk.W + tk.E)
         self.button.grid(row=2, column=2, sticky=tk.E + tk.W)
-        self.debug.grid(row=1, column=4, columnspan=2, sticky=tk.E)
-        self.info.grid(row=2, column=4, sticky=tk.E)
+        self.debugWidget.grid(row=1, column=4, columnspan=2, sticky=tk.E)
+        self.infoLabel.grid(row=2, column=4, sticky=tk.E)
+        #
+        self.input = None
+        self.response = None
+        self.logOut = None
+        self.successMessage = None
+        #
+        self.subscribers = set()
 
-    def retrainBot(self):
-        self.result = self.bot.train()
-        self.updateDebug(self.result)
+    def register(self, controller):
+        # self.subscribers.add(who)
+        self.controller = controller
 
-
-    ##
-    #   These methods take the input, sent it to the bot and print the response
-    ##
-
-
-    def handleInput(self, event):
-        # prüft ob in dem string was drinsteht
-        self.input = self.chatIn.get()
+    def notify_controller(self, event):
+        self.input = self.chatInWidget.get()
         if self.input:
-            self.response = self.bot.respond(input)
+            self.controller.handle_input(self.input)
 
-            self.updateChatOut(self.input)
-            self.updateLog(self.input)
+    def retrain_bot(self):
+        self.successMessage = self.bot.train()
+        self.updateDebug(self.successMessage)
 
-    # called when button is clicked/enter pressed, handles in/output
-    def updateChatOut(self, input):
+    # prints in chatout widget
+    def updateChatOut(self, input, response):
         # prints input, empties input field
-        self.chatOut.configure(state="normal")
-        self.chatOut.insert(tk.END, "Du: " + input + "\n")
-        self.chatOut.see(tk.END)
+        self.chatOutWidget.configure(state="normal")
+        self.chatOutWidget.insert(tk.END, "Du: " + input + "\n")
         # deletes text from index 0 till the end in input filed
-        self.chatIn.delete(0, tk.END)
+        self.chatInWidget.delete(0, tk.END)
         # inserts chatbot answer in chat
-        self.chatOut.insert(tk.END, self.cbName + ": " + self.bot.respond(input) + "\n")
-        self.chatOut.configure(state="disabled")
+        self.chatOutWidget.insert(tk.END, self.cbName + ": " + response + "\n")
+        self.chatOutWidget.see(tk.END)
+        self.chatOutWidget.configure(state="disabled")
 
     # prints to the log widget, used to display additional text data (sentiment etc)
-    def updateLog(self, input):
+    def updateLog(self, output):
         # unlock widget, inster, lock widget
-        self.log.configure(state="normal")
-        self.log.delete(1.0, tk.END)
+        self.logWidget.configure(state="normal")
+        self.logWidget.delete(1.0, tk.END)
         # print out emototional relevant word counts (normalized)
-        self.topics = self.bot.getTopics(input)
-        for item in self.topics:
-            self.log.insert(tk.END, item + "\n")
-        self.log.configure(state="disabled")
+        for item in output:
+            self.logWidget.insert(tk.END, item + "\n")
+        self.logWidget.configure(state="disabled")
 
     # prints to the debug widget
     def updateDebug(self, debug):
@@ -92,9 +93,9 @@ class newFrame:
         t = datetime.datetime.now()
         time = str(t.hour) + ":" + str(t.minute) + ":" + str(t.second)
         # unlock widget, inster, lock widget
-        self.debug.configure(state="normal")
-        self.debug.insert(tk.END, time + ": " + debug + "\n")
-        self.debug.configure(state="disabled")
+        self.debugWidget.configure(state="normal")
+        self.debugWidget.insert(tk.END, time + ": " + debug + "\n")
+        self.debugWidget.configure(state="disabled")
 
     def show(self):
         self.root.mainloop()
