@@ -7,14 +7,9 @@ class newController:
     def __init__(self, name):
         # intialize chat variables
         self.response = None
-        self.logmessage = None
+        self.log_message = None
 
         # initialize character parameters
-        self.h = set()
-        self.s = set()
-        self.a = set()
-        self.f = set()
-        self.d = set()
         self.character = character.newCharacter(
             {"trait": 0.3, "val": 0.3, "maxVal": 0.9, "actVal": 0.3},
             {"trait": 0.1, "val": 0.1, "maxVal": 0.7, "actVal": 0.2},
@@ -22,8 +17,8 @@ class newController:
             {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7},
             {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
         )
-        self.categories = ["joy", "sadness", "anger", "fear", "disguist"]
-        self.bot = bot.newBot(name, self.character, self.categories)
+        self.topic_categories = ["joy", "sadness", "anger", "fear", "disguist"]
+        self.bot = bot.newBot(name, self.character, self.topic_categories)
         self.bot.train()
 
         self.frame = frame.newFrame(name, self.bot)
@@ -34,12 +29,12 @@ class newController:
         # get response statement from bot
         self.response = self.bot.respond(input)
         # analyze input for topics
-        self.logmessage = self.bot.analyze_topics(input)
-        # get confidence for generated response
-        self.logmessage.append("\nresponse confidence: " + self.response.confidence.__str__())
+        self.log_message = self.response.extra_data["topics"]
+        # get confidence for generated response, add it to logmessage
+        self.log_message.append("\n--------------------------\nresponse confidence: " + self.response.confidence.__str__())
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())
-        self.frame.updateLog(self.logmessage)
+        self.frame.updateLog(self.log_message)
 
 
 controller = newController("EIKA")
