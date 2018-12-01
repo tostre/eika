@@ -68,7 +68,7 @@ class newBot:
                        "sadness: " + self.topicsSet["sadness"].__str__(),
                        "anger: " + self.topicsSet["anger"].__str__(),
                        "fear: " + self.topicsSet["fear"].__str__(),
-                       "disguist: " + self.topicsSet["disguist"].__str__()]
+                       "disgust: " + self.topicsSet["disgust"].__str__()]
         return self.topics
 
     # analyzes and returns emotions of the input

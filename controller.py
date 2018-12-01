@@ -17,7 +17,7 @@ class newController:
             {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7},
             {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
         )
-        self.topic_categories = ["joy", "sadness", "anger", "fear", "disguist"]
+        self.topic_categories = ["joy", "sadness", "anger", "fear", "disgust"]
         self.bot = bot.newBot(name, self.character, self.topic_categories)
         self.bot.train()
 
@@ -37,4 +37,4 @@ class newController:
         self.frame.updateLog(self.log_message)
 
 
-controller = newController("EIKA")
+controller = newController("bot")
