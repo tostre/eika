@@ -1,3 +1,7 @@
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
 class Character:
     def __init__(self, trait_values, max_values, act_values):
         self.trait_values = trait_values
@@ -32,6 +36,24 @@ class Character:
         print(self.emotional_state_output)
         #return ["hallo", "du"]
         return self.emotional_state_output
+
+    def function(self, type, x):
+        x = np.linspace(0, 100, 100)
+        y = np.sin(4*x)
+        y = 1 / (1 + np.exp(-x))
+        # creates a figure with index 1
+        plt.figure(1)
+        plt.plot(x, y)
+        #plt.plot([1, 2, 3, 4], [7, 1, 7, 5])
+        # The axis() command in the example above takes a list of [xmin, xmax, ymin, ymax] and specifies the viewport of the axe
+        #plt.axis([0, 6, 0, 20])
+        #plt.ylabel('some numbers')
+        plt.show()
+
+        if type == "sigmoid":
+            return 1 / (1 + np.exp(-x))
+
+
 
 # sentiment analysis
 # liu et al 2003
