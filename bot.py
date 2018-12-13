@@ -3,7 +3,7 @@ from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import ListTrainer
 import empath
 import spacy
-
+import tensorflow as tf
 
 class newBot:
     # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
@@ -23,8 +23,11 @@ class newBot:
         # self.bot.set_trainer(ChatterBotCorpusTrainer)
         self.bot.set_trainer(ListTrainer)
 
-        self.nlp = spacy.load("en")
-        self.spacy_test()
+        # self.nlp = spacy.load("en")
+        # self.spacy_test()
+
+        print("tensorflow version: " + tf.__version__)
+
 
     def spacy_test(self):
         # word tokenization

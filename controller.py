@@ -1,6 +1,41 @@
 import frame
 import bot
 import character
+import classifier
+# matrix and tensor computation
+import torch
+# layers, activation functions, loss funktions
+import torch.nn as nn
+# gradient-based back-propagation alogos
+import torch.optim as optim
+# shows a progress bar
+import tqdm
+# for plottinf
+import matplotlib.pyplot as plot
+
+
+# intialize chat variables
+name = "EIKA"
+response = None
+log_message = None
+
+# initialize character parameters
+character = character.newCharacter(
+    {"trait": 0.3, "val": 0.3, "maxVal": 0.9, "actVal": 0.3},
+    {"trait": 0.1, "val": 0.1, "maxVal": 0.7, "actVal": 0.2},
+    {"trait": 0.2, "val": 0.2, "maxVal": 0.4, "actVal": 0.5},
+    {"trait": 0.0, "val": 0.0, "maxVal": 0.5, "actVal": 0.7},
+    {"trait": 0.1, "val": 0.1, "maxVal": 0.6, "actVal": 0.3}
+)
+
+
+topic_categories = ["joy", "sadness", "anger", "fear", "disgust"]
+bot = bot.newBot(name, character, topic_categories)
+bot.train()
+
+frame = frame.newFrame(name, bot)
+frame.register()
+frame.show()
 
 
 class newController:
@@ -31,10 +66,12 @@ class newController:
         # analyze input for topics
         self.log_message = self.response.extra_data["topics"]
         # get confidence for generated response, add it to logmessage
-        self.log_message.append("\n--------------------------\nresponse confidence: " + self.response.confidence.__str__())
+        self.log_message.append(
+            "\n--------------------------\nresponse confidence: " + self.response.confidence.__str__())
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())
         self.frame.updateLog(self.log_message)
 
+# ein tf- oder pytrch-model ist egentlich die gewichte in dem neuronalen netz
 
-controller = newController("bot")
+#controller = newController("bot")
