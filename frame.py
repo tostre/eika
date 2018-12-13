@@ -2,7 +2,7 @@ import tkinter as tk
 import datetime
 
 
-class newFrame:
+class Frame:
     def __init__(self, cbName, bot):
         self.cbName = cbName
         # get bot instance from controller

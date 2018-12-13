@@ -1,17 +1,18 @@
-class newCharacter:
-    def __init__(self, h, s, a, f, d):
-        self.h = h
-        self.s = s
-        self.a = a
-        self.f = f
-        self.d = d
-        print("h: " + self.h.__str__())
-        print("s: " + self.s.__str__())
-        print("a: " + self.a.__str__())
-        print("f: " + self.f.__str__())
-        print("d: " + self.d.__str__())
+class Character:
+    def __init__(self, trait_values, max_values, act_values):
+        self.trait_values = trait_values
+        self.max_values = max_values
+        self.act_values = act_values
 
-    def updateEmotion(self, emotion, newVal):
+        self.emotional_state = {
+            "happiness": self.trait_values["happiness"],
+            "sadness": self.trait_values["sadness"],
+            "anger": self.trait_values["anger"],
+            "fear": self.trait_values["fear"],
+            "disgust": self.trait_values["disgust"]}
+
+
+    def update_emotional_state(self, emotion, newVal):
         pass
         # ich nehme surprise raus. Ist nur eine kurze reaktion auf ein event
         # das müsste man ganz anders behandeln als den rest der emotionen
@@ -22,6 +23,15 @@ class newCharacter:
         # Idee: Jede Emotion als Tupel beschreiben
         # Die "Höhe der Emotion von 0 bis 1"
         # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
+
+    def get_emotional_state(self):
+        self.emotional_state_output = ["\nBot emotional state:"]
+        for key, value in self.act_values.items():
+            self.emotional_state_output.append(key + ": " + value.__str__())
+        print("state out")
+        print(self.emotional_state_output)
+        #return ["hallo", "du"]
+        return self.emotional_state_output
 
 # sentiment analysis
 # liu et al 2003
