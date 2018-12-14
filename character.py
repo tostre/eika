@@ -2,18 +2,20 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class Character:
     def __init__(self, trait_values, max_values, act_values):
         self.trait_values = trait_values
         self.max_values = max_values
         self.act_values = act_values
 
-        self.emotional_state = {
-            "happiness": self.trait_values["happiness"],
-            "sadness": self.trait_values["sadness"],
-            "anger": self.trait_values["anger"],
-            "fear": self.trait_values["fear"],
-            "disgust": self.trait_values["disgust"]}
+        # set emotional state to trait (aka min-) values
+        self.emotional_state = [
+            self.trait_values["happiness"],
+            self.trait_values["sadness"],
+            self.trait_values["anger"],
+            self.trait_values["fear"],
+            self.trait_values["disgust"]]
 
 
     def update_emotional_state(self, emotion, newVal):
@@ -29,13 +31,10 @@ class Character:
         # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
 
     def get_emotional_state(self):
-        self.emotional_state_output = ["\nBot emotional state:"]
-        for key, value in self.act_values.items():
-            self.emotional_state_output.append(key + ": " + value.__str__())
-        print("state out")
-        print(self.emotional_state_output)
-        #return ["hallo", "du"]
-        return self.emotional_state_output
+        return self.emotional_state
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
 
     def function(self, type, x):
         x = np.linspace(0, 100, 100)

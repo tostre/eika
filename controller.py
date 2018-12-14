@@ -12,6 +12,10 @@ class Controller:
         self.response = None
         self.log_message = None
 
+        # list to build output strings
+        self.emotion_titles = ["happiness", "sadness", "anger", "fear", "disgust"]
+
+
         # initialize character, val = currentValue, act = activationValue
         self.trait_values = {"happiness": 0.3, "sadness": 0.1, "anger": 0.2, "fear": 0.0, "disgust": 0.1}
         self.max_values = {"happiness": 0.9, "sadness": 0.7, "anger": 0.4, "fear": 0.5, "disgust": 0.6}
@@ -36,17 +40,28 @@ class Controller:
         self.character.function("sigmoid", 2)
 
     def handle_input(self, input):
-        # generates response and analyzes it for topics/emotions etc
+        # generates a response
         self.response = self.bot.respond(input)
-        self.log_message = self.classifier.get_topics(input, self.emo_keyword_categories)
+        # analyse emotions in input
+        self.log_message = self.combine_lists("Input emotion analysis: ", self.classifier.get_emotions(input))
+        # analyses keywords for topics
+        self.log_message.extend(self.combine_lists("\nInput keyword analysis: ", self.classifier.get_topics(input, self.emo_keyword_categories)))
+        # append output confidence of answer
+        self.log_message.append("\nBot response confidence: " + self.response.confidence.__str__())
         # get character state
-        self.log_message.extend(self.character.get_emotional_state())
-        # display output message date
-        self.log_message.append("\nResponse data:")
-        self.log_message.append("response confidence: " + self.response.confidence.__str__())
+        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.character.get_emotional_state()))
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())
         self.frame.updateLog(self.log_message)
+
+    # combines to lists, eg: emotion names from one list and the respective values from another
+    def combine_lists(self, title, list):
+        self.a = [title]
+        for item in range(0, 5):
+            self.a.append(self.emotion_titles[item] + ": " + list[item].__str__())
+        print(self.a)
+
+        return self.a
 
 
 # ein tf- oder pytrch-model ist egentlich die gewichte in dem neuronalen netz
