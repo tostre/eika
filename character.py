@@ -2,7 +2,13 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+# Idee: Der Charakter wird definiert durch:
+# 1. Die emo-listen (traits, max_val, act_val
+# 2. Welcher state-Wert durch welche anderen Werte beeinflusst wird
+# 3. Die Beziehung zu einem anderen Menschen (das beeinflusst welcher
+#    Input-Wert welchen emo-Wert wie beeinflusst
+# Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
+# werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 class Character:
     def __init__(self, trait_values, max_values, act_values):
         self.trait_values = trait_values
@@ -11,14 +17,77 @@ class Character:
 
         # set emotional state to trait (aka min-) values
         self.emotional_state = [
-            self.trait_values["happiness"],
-            self.trait_values["sadness"],
-            self.trait_values["anger"],
-            self.trait_values["fear"],
-            self.trait_values["disgust"]]
+            self.trait_values[0],
+            self.trait_values[1],
+            self.trait_values[2],
+            self.trait_values[3],
+            self.trait_values[4]]
+        # 1 = positive relation, 0, negative relation
+        # 0 happiness
+        # 1 sadness
+        # 2 anger
+        # 3 fear
+        # 4 disgust
+        self.input_modificators = {
+            0: [[0, 1], [2, 0]],
+            1: [[0, 0], [1, 1], [3, 1]],
+            2: [[0, 0], [2, 1]],
+            3: [[2, 1], [3, 1], [4, 1]],
+            4: []
+        }
+
+        self.input_modificators = {
+            0: [[1, 0, 1, 0, 0], [1, 0, -1, 0, 0]],
+            1: [[1, 1, 0, 1, 0], [-1, 1, 0, 1, 0]],
+            2: [[1, 0, 1, 0, 0], [-1, 0, 1, 0, 0]],
+            3: [[0, 0, 1, 1, 1], [0, 0, 1, 1, 1]],
+            4: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
+        }
+
+        self.state_modificators = {}
+
+    def up(self, input_emotions):
+        self.input_emotions = input_emotions
+        self.input_emotions = [0.32, 0.12, 0.07, 0.73, 0.20]
+        # hier am beispiel von happiness
+
+        # 0 = happiness
+        self.emotion = 0
+        #print("emotion: " + self.emotion.__str__())
+        self.old_val = self.emotional_state[self.emotion]
+        #print("old_val: " + self.old_val.__str__())
 
 
-    def update_emotional_state(self, emotion, newVal):
+        self.updaters = [[],[],[],[],[]]
+
+        print(len(self.input_modificators))
+        #for item in range(len(self.input_modificators)):
+        for index in range(len(self.input_modificators)):
+            print("\n__________________________________________________________________________________________________________________________________________________________")
+            print("\nemotion: " + index.__str__() + ", mods: " + self.input_modificators[index].__str__())
+            self.single_emotion_modificaors = self.input_modificators[index]
+            self.which_ones = self.input_modificators[index][0]
+            self.how = self.input_modificators[index][1]
+            self.act = self.act_values[index]
+
+            for index2 in range(len(self.which_ones)):
+                print("\nemotion: " + index2.__str__() + ", has Inflicene?: " + self.which_ones[index2].__str__()  + ", input: " + input_emotions[index2].__str__() + ", how: " + self.how[index2].__str__() + ", act: " + self.act.__str__() + ", old_val: " + self.emotional_state[index].__str__())
+                self. updater = input_emotions[index2] * self.which_ones[index2] * self.how[index2] * self.act
+                print("updater: " + self.updater.__str__())
+                self.updaters[index].append(self.updater)
+                self.emotional_state[index] = round((self.emotional_state[index]  + self.updater), 2)
+                print("new val: " + self.emotional_state[index].__str__())
+
+            print("updater array for emotion " + index.__str__() + " : " + self.updaters.__str__())
+
+        print("updater: " + self.updaters.__str__())
+
+    # Wichtige erkenntnisse: Negative emotionen überschatten positive (quellen)
+    # wenn man sauer oder traurig ist, denkt man nur noch an das negative
+    # deshalben sollten negative emotionen die positiven nach unten drücken
+    # (d.h. mehr effekt haben als die positiven, bzw. diese unterdrücken)
+    # außerdem sollten emotionen mit jedem zeitschritt (zB jede nachricht) abnehmen
+    def update_emotional_state(self, input_emotions):
         pass
         # ich nehme surprise raus. Ist nur eine kurze reaktion auf ein event
         # das müsste man ganz anders behandeln als den rest der emotionen
@@ -29,6 +98,12 @@ class Character:
         # Idee: Jede Emotion als Tupel beschreiben
         # Die "Höhe der Emotion von 0 bis 1"
         # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
+
+    def update_happiness(self, input_emotions):
+        # base calc happiness und anger
+        self.new_hap = self.emotional_state[0] + (input_emotions[0] * self.act_values[0])
+        print("new hap: " + self.new_hap.__str__())
+
 
     def get_emotional_state(self):
         return self.emotional_state

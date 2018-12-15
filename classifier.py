@@ -17,6 +17,7 @@ class Classifier:
 
     # analyzes and returns topics of the input using empath
     def get_topics(self, input, keyword_categories):
+        self.keyword_analysis = []
         self.topics_set = self.lexicon.analyze(input, categories=keyword_categories, normalize=True)
         for item in keyword_categories:
             self.keyword_analysis.append(self.topics_set[item].__str__())
@@ -28,6 +29,7 @@ class Classifier:
 
     # atm returns a list of random generated emotion values
     def get_emotions(self, input):
+        self.emotion_analysis = []
         self.emotion_analysis = [round(random.uniform(0, 1), 2),
                                  round(random.uniform(0, 1), 2),
                                  round(random.uniform(0, 1), 2),

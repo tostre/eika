@@ -10,17 +10,20 @@ class Controller:
     def __init__(self, name):
         # intialize chat variables
         self.response = None
-        self.log_message = None
+        self.log_message = []
+        self.input_emotions = []
+        self.input_topics = []
+        self.response_confidence = None
 
-        # list to build output strings
+        # list to build output strings, all lists are in this order
         self.emotion_titles = ["happiness", "sadness", "anger", "fear", "disgust"]
 
-
         # initialize character, val = currentValue, act = activationValue
-        self.trait_values = {"happiness": 0.3, "sadness": 0.1, "anger": 0.2, "fear": 0.0, "disgust": 0.1}
-        self.max_values = {"happiness": 0.9, "sadness": 0.7, "anger": 0.4, "fear": 0.5, "disgust": 0.6}
-        self.act_values = {"happiness": 0.3, "sadness": 0.2, "anger": 0.5, "fear": 0.7, "disgust": 0.3}
+        self.trait_values = [0.42, 0.13, 0.24, 0.00, 0.10]
+        self.max_values = [0.9, 0.7, 0.4, 0.5, 0.6]
+        self.act_values = [0.3, 0.2, 0.5, 0.7, 0.3]
         self.character = Character(self.trait_values, self.max_values, self.act_values)
+        self.emotional_state = self.character.get_emotional_state()
 
         # create classifier topic keyword categories, classifier anlyzes inputs for these topics, emotions etc
         self.emo_keyword_categories = ["joy", "sadness", "anger", "fear", "disgust"]
@@ -33,23 +36,34 @@ class Controller:
         self.bot.train()
 
         # create frame
-        self.frame = Frame(name, self.bot)
+        self.frame = Frame(name, self.bot, self.emotion_titles, self.emotional_state)
         self.frame.register(self)
         self.frame.show()
-
-        self.character.function("sigmoid", 2)
 
     def handle_input(self, input):
         # generates a response
         self.response = self.bot.respond(input)
         # analyse emotions in input
-        self.log_message = self.combine_lists("Input emotion analysis: ", self.classifier.get_emotions(input))
+        self.input_emotions = self.classifier.get_emotions(input)
         # analyses keywords for topics
-        self.log_message.extend(self.combine_lists("\nInput keyword analysis: ", self.classifier.get_topics(input, self.emo_keyword_categories)))
+        self.input_topics = self.classifier.get_topics(input, self.emo_keyword_categories)
         # append output confidence of answer
-        self.log_message.append("\nBot response confidence: " + self.response.confidence.__str__())
+        self.response_confidence = self.response.confidence.__str__()
+        # generate new emotional state of the character of the bot
+        self.character.up(self.input_emotions)
+
         # get character state
-        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.character.get_emotional_state()))
+        #self.character.update_emotional_state(self.input_emotions)
+        #self.character.up(self.emotional_state)
+
+        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.input_emotions))
+
+
+        # append log message
+        self.log_message = self.combine_lists("Input emotion analysis: ", self.input_emotions)
+        self.log_message.extend(self.combine_lists("\nInput keyword analysis: ", self.input_topics))
+        self.log_message.append("\nBot response confidence: " + self.response_confidence)
+
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())
         self.frame.updateLog(self.log_message)
@@ -59,8 +73,6 @@ class Controller:
         self.a = [title]
         for item in range(0, 5):
             self.a.append(self.emotion_titles[item] + ": " + list[item].__str__())
-        print(self.a)
-
         return self.a
 
 

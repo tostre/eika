@@ -1,12 +1,19 @@
 import tkinter as tk
 import datetime
 
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import pandas as pd
+from math import pi
+
 
 class Frame:
-    def __init__(self, cbName, bot):
+    def __init__(self, cbName, bot, emotion_titles, emotional_state):
         self.cbName = cbName
         # get bot instance from controller
         self.bot = bot
+        self.emotion_titles = emotion_titles
+        self.emotional_state = emotional_state
         # widget initialization
         self.root = tk.Tk()
         # create menubar
@@ -52,6 +59,29 @@ class Frame:
         #
         self.subscribers = set()
 
+    def draw_radar_chart(self, emotional_state):
+        # We are going to plot the first line of the data frame.
+        # But we need to repeat the first value to close the circular graph:
+        # appends the list with the first item in the list
+        emotional_state.append(emotional_state[0])
+        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+        angles = [n / float(5) * 2 * pi for n in range(5)]
+        angles += angles[:1]
+        # Initialise the spider plot
+        ax = plt.subplot(111, polar=True)
+        # Draw one axe per variable + add labels labels yet
+        plt.xticks(angles[:-1], self.emotion_titles, color='grey', size=8)
+        # Draw ylabels
+        ax.set_rlabel_position(0)
+        plt.yticks([0.2, 0.4, 0.6, 0.8], ["0.2", "0.4", "0.6", "0.8"], color="grey", size=7)
+        plt.ylim(0, 1)
+        # Plot data
+        ax.plot(angles, emotional_state, linewidth=1, linestyle='solid')
+        # Fill area
+        ax.fill(angles, emotional_state, 'b', alpha=0.1)
+        plt.show()
+
+    # the following two function implement the observer pattern
     def register(self, controller):
         # self.subscribers.add(who)
         self.controller = controller
