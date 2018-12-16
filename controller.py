@@ -15,54 +15,44 @@ class Controller:
         self.input_topics = []
         self.response_confidence = None
 
-        # list to build output strings, all lists are in this order
+        # initialize emotional variables
         self.emotion_titles = ["happiness", "sadness", "anger", "fear", "disgust"]
-
-        # initialize character, val = currentValue, act = activationValue
-        self.trait_values = [0.42, 0.13, 0.24, 0.00, 0.10]
-        self.max_values = [0.9, 0.7, 0.4, 0.5, 0.6]
-        self.act_values = [0.3, 0.2, 0.5, 0.7, 0.3]
-        self.character = Character(self.trait_values, self.max_values, self.act_values)
-        self.emotional_state = self.character.get_emotional_state()
-
-        # create classifier topic keyword categories, classifier anlyzes inputs for these topics, emotions etc
         self.emo_keyword_categories = ["joy", "sadness", "anger", "fear", "disgust"]
         self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
         self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
-        self.classifier = Classifier()
 
-        # create bot, responsoble for generating answers
+        # initialize character, val = currentValue, act = activationValue
+        self.trait_values = [0.42, 0.13, 0.24, 0.02, 0.10]
+        self.max_values = [0.92, 0.70, 0.44, 0.57, 0.61]
+        self.act_values = [0.21, 0.12, 0.30, 0.05, 0.10]
+        self.character = Character(self.trait_values, self.max_values, self.act_values)
+        self.emotional_state = self.character.get_emotional_state()
+
+        # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.bot = Bot(name)
         self.bot.train()
+        self.classifier = Classifier()
 
         # create frame
         self.frame = Frame(name, self.bot, self.emotion_titles, self.emotional_state)
         self.frame.register(self)
         self.frame.show()
 
+    # take user input, generate new data an update ui
     def handle_input(self, input):
-        # generates a response
+        # get new values based in response
         self.response = self.bot.respond(input)
-        # analyse emotions in input
         self.input_emotions = self.classifier.get_emotions(input)
-        # analyses keywords for topics
         self.input_topics = self.classifier.get_topics(input, self.emo_keyword_categories)
-        # append output confidence of answer
         self.response_confidence = self.response.confidence.__str__()
-        # generate new emotional state of the character of the bot
-        self.character.up(self.input_emotions)
-
-        # get character state
-        #self.character.update_emotional_state(self.input_emotions)
-        #self.character.up(self.emotional_state)
-
+        self.emotional_state = self.character.update_emotional_state(self.input_emotions)
         self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.input_emotions))
-
 
         # append log message
         self.log_message = self.combine_lists("Input emotion analysis: ", self.input_emotions)
         self.log_message.extend(self.combine_lists("\nInput keyword analysis: ", self.input_topics))
-        self.log_message.append("\nBot response confidence: " + self.response_confidence)
+        self.log_message.append("\nBot response confidence:\nconfidence " + self.response_confidence)
+        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.emotional_state))
 
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())

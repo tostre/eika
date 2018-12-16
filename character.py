@@ -11,9 +11,13 @@ import matplotlib.pyplot as plt
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 class Character:
     def __init__(self, trait_values, max_values, act_values):
+        # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
+        # this person gets mad real quick and overreacts to incoming emotions
+        # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
+        self.act_values = act_values
+        # trait_values are the min-value of an emotion
         self.trait_values = trait_values
         self.max_values = max_values
-        self.act_values = act_values
 
         # set emotional state to trait (aka min-) values
         self.emotional_state = [
@@ -22,110 +26,82 @@ class Character:
             self.trait_values[2],
             self.trait_values[3],
             self.trait_values[4]]
-        # 1 = positive relation, 0, negative relation
-        # 0 happiness
-        # 1 sadness
-        # 2 anger
-        # 3 fear
-        # 4 disgust
-        self.input_modificators = {
-            0: [[0, 1], [2, 0]],
-            1: [[0, 0], [1, 1], [3, 1]],
-            2: [[0, 0], [2, 1]],
-            3: [[2, 1], [3, 1], [4, 1]],
-            4: []
-        }
 
-        self.input_modificators = {
+        # Show which incoming (in am message) emotions affet the emotional state of the character
+        # 0:/1:/.../4: happiness, sadness, anger, fear, disgust
+        # [0,1,1,0,0]: Shows if these emotions affect the emotion in front of the []
+        # [0, 1,-1,1]: SHows if the emotion affects the emotion in front of the [] positivly/negatively
+        self.input_modifier = {
             0: [[1, 0, 1, 0, 0], [1, 0, -1, 0, 0]],
             1: [[1, 1, 0, 1, 0], [-1, 1, 0, 1, 0]],
             2: [[1, 0, 1, 0, 0], [-1, 0, 1, 0, 0]],
             3: [[0, 0, 1, 1, 1], [0, 0, 1, 1, 1]],
             4: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
         }
+        # Show which of t
+        # he emotional-state values affect the change of other state-values
+        # eg: When you're mighty mad it's harder to make you happy, than if you're just a bit mad
+        self.state_modifier = {}
 
-        self.state_modificators = {}
+        self.which_ones = []
+        self.how = []
 
-    def up(self, input_emotions):
+    def update_emotional_state(self, input_emotions):
         self.input_emotions = input_emotions
         self.input_emotions = [0.32, 0.12, 0.07, 0.73, 0.20]
-        # hier am beispiel von happiness
-
-        # 0 = happiness
         self.emotion = 0
-        #print("emotion: " + self.emotion.__str__())
         self.old_val = self.emotional_state[self.emotion]
-        #print("old_val: " + self.old_val.__str__())
 
+        print(self.emotional_state)
 
-        self.updaters = [[],[],[],[],[]]
+        # repeat for every of the 5 emotions that shall be affected
+        for index in range(len(self.input_modifier)):
+            # Extract two lists that show which emotions affect the current one and if the affetion is poistive/negative
+            self.which_ones = self.input_modifier[index][0]
+            self.how = self.input_modifier[index][1]
+            print("\nemotion: " + index.__str__() + ", mods: " + self.input_modifier[index].__str__() + ", input: " + input_emotions.__str__() + ", act: " + self.act_values.__str__() + "\n")
 
-        print(len(self.input_modificators))
-        #for item in range(len(self.input_modificators)):
-        for index in range(len(self.input_modificators)):
-            print("\n__________________________________________________________________________________________________________________________________________________________")
-            print("\nemotion: " + index.__str__() + ", mods: " + self.input_modificators[index].__str__())
-            self.single_emotion_modificaors = self.input_modificators[index]
-            self.which_ones = self.input_modificators[index][0]
-            self.how = self.input_modificators[index][1]
-            self.act = self.act_values[index]
-
+            # repeat for every of the 5 emotion that affect the current emotion from loop 1
             for index2 in range(len(self.which_ones)):
-                print("\nemotion: " + index2.__str__() + ", has Inflicene?: " + self.which_ones[index2].__str__()  + ", input: " + input_emotions[index2].__str__() + ", how: " + self.how[index2].__str__() + ", act: " + self.act.__str__() + ", old_val: " + self.emotional_state[index].__str__())
-                self. updater = input_emotions[index2] * self.which_ones[index2] * self.how[index2] * self.act
-                print("updater: " + self.updater.__str__())
-                self.updaters[index].append(self.updater)
+                self. updater = input_emotions[index2] * self.which_ones[index2] * self.how[index2] * self.act_values[index]
                 self.emotional_state[index] = round((self.emotional_state[index]  + self.updater), 2)
-                print("new val: " + self.emotional_state[index].__str__())
 
-            print("updater array for emotion " + index.__str__() + " : " + self.updaters.__str__())
+                # check if the new value i not bigger or smaller than the max or trait values
+                if self.emotional_state[index] > self.max_values[index]:
+                    self.emotional_state[index] = self.max_values[index]
+                elif self.emotional_state[index] < self.trait_values[index]:
+                    self.emotional_state[index] = self.trait_values[index]
 
-        print("updater: " + self.updaters.__str__())
+                print("Old_val: " + self.emotional_state[index].__str__() + ", updater: " + self.updater.__str__() + ", new val: " + self.emotional_state[index].__str__())
+
+        return self.emotional_state
+
+
+
 
     # Wichtige erkenntnisse: Negative emotionen überschatten positive (quellen)
     # wenn man sauer oder traurig ist, denkt man nur noch an das negative
     # deshalben sollten negative emotionen die positiven nach unten drücken
     # (d.h. mehr effekt haben als die positiven, bzw. diese unterdrücken)
     # außerdem sollten emotionen mit jedem zeitschritt (zB jede nachricht) abnehmen
-    def update_emotional_state(self, input_emotions):
-        pass
-        # ich nehme surprise raus. Ist nur eine kurze reaktion auf ein event
-        # das müsste man ganz anders behandeln als den rest der emotionen
-        # es eignet sich außerdem nicht als personality trait
-        # emotioen treten nur als einzelne werte auf, nicht in einem vektor
-        # es können trotzdem mehrere emotionen zugleich auftreten
-        # das gleiche gilt für stimmungen
-        # Idee: Jede Emotion als Tupel beschreiben
-        # Die "Höhe der Emotion von 0 bis 1"
-        # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
 
-    def update_happiness(self, input_emotions):
-        # base calc happiness und anger
-        self.new_hap = self.emotional_state[0] + (input_emotions[0] * self.act_values[0])
-        print("new hap: " + self.new_hap.__str__())
+    # ich nehme surprise raus. Ist nur eine kurze reaktion auf ein event
+    # das müsste man ganz anders behandeln als den rest der emotionen
+    # es eignet sich außerdem nicht als personality trait
+    # emotioen treten nur als einzelne werte auf, nicht in einem vektor
+    # es können trotzdem mehrere emotionen zugleich auftreten
+    # das gleiche gilt für stimmungen
+    # Idee: Jede Emotion als Tupel beschreiben
+    # Die "Höhe der Emotion von 0 bis 1"
+    # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
+
+
 
 
     def get_emotional_state(self):
         return self.emotional_state
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
 
-    def function(self, type, x):
-        x = np.linspace(0, 100, 100)
-        y = np.sin(4*x)
-        y = 1 / (1 + np.exp(-x))
-        # creates a figure with index 1
-        plt.figure(1)
-        plt.plot(x, y)
-        #plt.plot([1, 2, 3, 4], [7, 1, 7, 5])
-        # The axis() command in the example above takes a list of [xmin, xmax, ymin, ymax] and specifies the viewport of the axe
-        #plt.axis([0, 6, 0, 20])
-        #plt.ylabel('some numbers')
-        plt.show()
-
-        if type == "sigmoid":
-            return 1 / (1 + np.exp(-x))
 
 
 

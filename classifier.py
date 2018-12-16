@@ -20,7 +20,7 @@ class Classifier:
         self.keyword_analysis = []
         self.topics_set = self.lexicon.analyze(input, categories=keyword_categories, normalize=True)
         for item in keyword_categories:
-            self.keyword_analysis.append(self.topics_set[item].__str__())
+            self.keyword_analysis.append(round(self.topics_set[item], 2).__str__())
         return self.keyword_analysis
 
     # analyzses and returns general sentiment of the input
