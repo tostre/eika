@@ -27,6 +27,7 @@ class Controller:
         self.act_values = [0.21, 0.12, 0.30, 0.05, 0.10]
         self.character = Character(self.trait_values, self.max_values, self.act_values)
         self.emotional_state = self.character.get_emotional_state()
+        self.emotional_history = self.character.get_emotional_history()
 
         # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.bot = Bot(name)
@@ -46,6 +47,7 @@ class Controller:
         self.input_topics = self.classifier.get_topics(input, self.emo_keyword_categories)
         self.response_confidence = self.response.confidence.__str__()
         self.emotional_state = self.character.update_emotional_state(self.input_emotions)
+        self.emotional_history = self.character.update_emotional_history(self.emotional_state)
         self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.input_emotions))
 
         # append log message
@@ -57,6 +59,7 @@ class Controller:
         # update widgets
         self.frame.updateChatOut(input, self.response.__str__())
         self.frame.updateLog(self.log_message)
+        self.frame.update_diagram(self.emotional_state, self.character.get_emotional_history())
 
     # combines to lists, eg: emotion names from one list and the respective values from another
     def combine_lists(self, title, list):

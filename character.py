@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 class Character:
     def __init__(self, trait_values, max_values, act_values):
+        self.a = 1
         # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
         # this person gets mad real quick and overreacts to incoming emotions
         # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
@@ -26,6 +27,17 @@ class Character:
             self.trait_values[2],
             self.trait_values[3],
             self.trait_values[4]]
+
+        # saves the last five emotional states, rows = jeweils ein zeitschritt, spalte=jeweils eine emotion
+        self.emotional_history = [
+            self.emotional_state.copy(),
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ]
+
+        print(self.emotional_history)
 
         # Show which incoming (in am message) emotions affet the emotional state of the character
         # 0:/1:/.../4: happiness, sadness, anger, fear, disgust
@@ -52,14 +64,14 @@ class Character:
         self.emotion = 0
         self.old_val = self.emotional_state[self.emotion]
 
-        print(self.emotional_state)
+        # print(self.emotional_state)
 
         # repeat for every of the 5 emotions that shall be affected
         for index in range(len(self.input_modifier)):
             # Extract two lists that show which emotions affect the current one and if the affetion is poistive/negative
             self.which_ones = self.input_modifier[index][0]
             self.how = self.input_modifier[index][1]
-            print("\nemotion: " + index.__str__() + ", mods: " + self.input_modifier[index].__str__() + ", input: " + input_emotions.__str__() + ", act: " + self.act_values.__str__() + "\n")
+            # print("\nemotion: " + index.__str__() + ", mods: " + self.input_modifier[index].__str__() + ", input: " + input_emotions.__str__() + ", act: " + self.act_values.__str__() + "\n")
 
             # repeat for every of the 5 emotion that affect the current emotion from loop 1
             for index2 in range(len(self.which_ones)):
@@ -71,11 +83,19 @@ class Character:
                     self.emotional_state[index] = self.max_values[index]
                 elif self.emotional_state[index] < self.trait_values[index]:
                     self.emotional_state[index] = self.trait_values[index]
-
-                print("Old_val: " + self.emotional_state[index].__str__() + ", updater: " + self.updater.__str__() + ", new val: " + self.emotional_state[index].__str__())
+                # print("Old_val: " + self.emotional_state[index].__str__() + ", updater: " + self.updater.__str__() + ", new val: " + self.emotional_state[index].__str__())
 
         return self.emotional_state
 
+    def update_emotional_history(self, emotional_state):
+        # Deletes the last entry in the list and copys the ones from the new emo_state to the front
+        #print("\n\n")
+        #print(self.emotional_history)
+        self.emotional_history = self.emotional_history[:-1]
+        self.emotional_history = [self.emotional_state.copy()] + self.emotional_history
+        print("histoy")
+        print(self.emotional_history)
+        return self.emotional_history
 
 
 
@@ -100,6 +120,9 @@ class Character:
 
     def get_emotional_state(self):
         return self.emotional_state
+
+    def get_emotional_history(self):
+        return self.emotional_history
 
 
 
