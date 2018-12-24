@@ -26,6 +26,7 @@ class Bot:
             "Your flight has been booked."
         ])
         # self.bot.train("chatterbot.corpus.english")
+        print("bot trained")
         return "Training complete"
 
     # returns chatbot response, with some additional data

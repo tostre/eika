@@ -2,6 +2,7 @@ from frame import Frame
 from bot import Bot
 from character import Character
 from classifier import Classifier
+import numpy as np
 
 
 # controller class, every subsystem is initialized and called here
@@ -37,8 +38,6 @@ class Controller:
         # create frame and update widgets with initial values
         self.frame = Frame(name, self.bot, self.emotional_state, self.emotional_history)
         self.frame.register(self)
-        #self.frame.update_diagram(self.emotional_state, self.character.get_emotional_history())
-        #self.handle_input("a")
         self.frame.show()
 
     # take user input, generate new data an update ui

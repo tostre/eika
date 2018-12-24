@@ -1,11 +1,10 @@
 import tkinter as tk
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-import matplotlib
-matplotlib.use('TkAgg')
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as FigureCanvas
-
+matplotlib.use('TkAgg')
 
 class Frame:
     def __init__(self, cb_name, bot, init_emotional_state, init_emotional_history):
@@ -16,7 +15,6 @@ class Frame:
         self.response = None
         self.root = tk.Tk()
         self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
-        self.fig = Figure()
 
         # create menubar
         self.menubar = tk.Menu(self.root)
@@ -25,7 +23,7 @@ class Frame:
         self.filemenu.add_command(label="Edit bot mood")
         self.filemenu.add_command(label="Edit bot emotions")
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Retrain chatbot", command=self.retrain_bot)
+        self.filemenu.add_command(label="Retrain chatbot", command=self.bot.train)
         self.filemenu.add_command(label="Update canvas", command=self.update_diagrams)
         self.menubar.add_cascade(label="Configure", menu=self.filemenu)
 
@@ -41,11 +39,11 @@ class Frame:
         self.chatin.focus_set()
         self.log = tk.Text(self.root, width=40, state="disabled")
         self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
-        self.button = tk.Button(self.root, text="Send", command=self.notify_controller)
+        self.button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
 
         # create diagram space
         self.diagram_frame = tk.Frame(self.root)
-        self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)  # a tk drawingare
+        self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)
 
         # position ui elements
         self.chatout.grid(row=1, column=1, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
@@ -61,18 +59,21 @@ class Frame:
         self.subscribers = set()
 
     # the following two function implement the observer pattern
-    def register(self, controller):
-        # self.subscribers.add(who)
-        self.controller = controller
+    def register(self, who):
+        # Set of subscribers, there should only ever be the controller in there
+        self.subscribers.add(who)
+        # Controller class, only class this one here is allowed to talk to
+        self.controller = who
+
+    # Delays a command to the notify_controller from objects that cant pass an event (like the button)
+    def notify_controller_proxy(self):
+        self.notify_controller(None)
 
     def notify_controller(self, event):
-        print(event)
         self.user_input = self.chatin.get()
+        print("not")
         if self.user_input:
             self.controller.handle_input(self.user_input)
-
-    def retrain_bot(self):
-        self.bot.train()
 
     # prints in chatout widget
     def update_chatout(self, input, response):
@@ -112,22 +113,24 @@ class DiagramManager:
         self.polar_chart_yticks_positions = [0.2, 0.4, 0.6, 0.8]
         self.polar_chart_yticks_labels = [".2", ".4", ".6", ".8"]
         self.time_chart_x_values = [0, -1, -2, -3, -4]
+        self.labels = []
         self.plot_colors = ["orange", "grey", "red", "blue", "green"]
         self.plot_classes = ["hap", "sad", "ang", "fea", "dis"]
 
-        # 3D-lines that depict the development of the emotional state
+        # 2D-lines that depict the development of the emotional state
         self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5 = (None, None, None, None, None)
         self.polar_plot = None
         self.bar_plot = None
 
         # init figure and subplots/axes
-        self.fig, (self.ax3, self.ax4) = plt.subplots(nrows=2, ncols=1)
-        # self.fig, ((self.ax1, self.ax2), (self.ax3, self.ax4)) = plt.subplots(nrows=2, ncols=2)
+        self.fig = matplotlib.figure.Figure()
+        self.ax3 = self.fig.add_subplot(211)
+        self.ax4 = self.fig.add_subplot(212)
         # self.make_radar_chart(self.ax1, "Input emotions", 221, self.init_polar_data)
         # self.make_radar_chart(self.ax2, "Input keywords", 222, self.init_polar_data)
         self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
         self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
-        self.fig.tight_layout()
+        self.fig.set_tight_layout(True)
 
     def get_diagrams(self):
         return self.fig
@@ -138,7 +141,12 @@ class DiagramManager:
         ax.set_ylim(0, 1)
         ax.yaxis.tick_right()
         ax.grid(axis="y", linestyle=':', linewidth=.5)
-        ax.bar(self.plot_classes, init_bar_data, width=.9, color=self.plot_colors, alpha=.75)
+
+        self.labels.clear()
+        for index in range(len(self.plot_classes)):
+            self.labels.append(self.plot_classes[index] + " (" + init_bar_data[index].__str__() + ")")
+
+        ax.bar(self.labels, init_bar_data, width=.9, color=self.plot_colors, alpha=.75)
 
     def update_bar_chart(self, ax, emotional_state, canvas):
         ax.clear()
@@ -189,7 +197,7 @@ class DiagramManager:
         self.polar_plot.set_xdata(new_data[0])
         canvas.draw()
 
-    # old method
+    # old methods
     def old(self):
         # tutorial commands for using axes/suplots etc
         # Benutze diese Methode für polar-Diagramme
@@ -223,3 +231,28 @@ class DiagramManager:
         # In most cases, add_subplot would be the prefered method to create axes for plots on a canvas.
         # Only in cases where exact positioning matters, add_axes might be useful.
         pass
+
+    # hier wird die plt.Figure benutzt statt die matplotbib-figure. Die wird aber nicht richtig beendet, wenn das Fenster geschlossen wird
+    def __init2(self, init_emotional_state, init_emotional_history):
+        # Data that is needed to make the diagrams (labels, ticks, colors, etc)
+        self.polar_angles = [n / float(5) * 2 * np.pi for n in range(5)]
+        self.polar_angles += self.polar_angles[:1]
+        self.polar_chart_yticks_positions = [0.2, 0.4, 0.6, 0.8]
+        self.polar_chart_yticks_labels = [".2", ".4", ".6", ".8"]
+        self.time_chart_x_values = [0, -1, -2, -3, -4]
+        self.plot_colors = ["orange", "grey", "red", "blue", "green"]
+        self.plot_classes = ["hap", "sad", "ang", "fea", "dis"]
+
+        # 3D-lines that depict the development of the emotional state
+        self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5 = (None, None, None, None, None)
+        self.polar_plot = None
+        self.bar_plot = None
+
+        # init figure and subplots/axes
+        self.fig, (self.ax3, self.ax4) = plt.subplots(nrows=2, ncols=1)
+        #self.fig, ((self.ax1, self.ax2), (self.ax3, self.ax4)) = plt.subplots(nrows=2, ncols=2)
+        # self.make_radar_chart(self.ax1, "Input emotions", 221, self.init_polar_data)
+        # self.make_radar_chart(self.ax2, "Input keywords", 222, self.init_polar_data)
+        self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
+        self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
+        self.fig.tight_layout()
