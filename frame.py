@@ -1,5 +1,4 @@
 import tkinter as tk
-import datetime
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import matplotlib
@@ -9,18 +8,14 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as FigureCanvas
 
 
 class Frame:
-    def __init__(self, cbName, bot, emotion_titles, emotional_state):
+    def __init__(self, cb_name, bot, init_emotional_state, init_emotional_history):
         # initialise variables
-        self.cbName = cbName
+        self.cb_name = cb_name
         self.bot = bot
-        self.emotion_titles = emotion_titles
-        self.emotional_state = emotional_state
-        self.input = None
+        self.user_input = None
         self.response = None
-        self.logOut = None
-        self.successMessage = None
         self.root = tk.Tk()
-        self.dgm = DiagramManager()
+        self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
         self.fig = Figure()
 
         # create menubar
@@ -31,37 +26,38 @@ class Frame:
         self.filemenu.add_command(label="Edit bot emotions")
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Retrain chatbot", command=self.retrain_bot)
-        self.filemenu.add_command(label="Update canvas", command=self.update_diagram)
+        self.filemenu.add_command(label="Update canvas", command=self.update_diagrams)
         self.menubar.add_cascade(label="Configure", menu=self.filemenu)
 
         # create root-window
         self.root.configure(menu=self.menubar)
-        self.root.title(cbName)
+        self.root.title(cb_name)
         self.root.resizable(0, 0)
 
         # create widgets
-        self.chatOutWidget = tk.Text(self.root, width=60, state="disabled")
-        self.chatInWidget = tk.Entry(self.root)
-        self.chatInWidget.bind('<Return>', self.notify_controller)
-        self.chatInWidget.focus_set()
-        self.logWidget = tk.Text(self.root, width=60, state="disabled")
-        self.infoLabel = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
+        self.chatout = tk.Text(self.root, width=60, state="disabled")
+        self.chatin = tk.Entry(self.root)
+        self.chatin.bind('<Return>', self.notify_controller)
+        self.chatin.focus_set()
+        self.log = tk.Text(self.root, width=40, state="disabled")
+        self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
         self.button = tk.Button(self.root, text="Send", command=self.notify_controller)
 
         # create diagram space
         self.diagram_frame = tk.Frame(self.root)
-        self.diagram_canvas = FigureCanvas(self.dgm.get_figure(), master=self.diagram_frame) # a tk drawingare
+        self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)  # a tk drawingare
 
         # position ui elements
-        self.chatOutWidget.grid(row=1, column=1, columnspan=2, sticky=tk.E+tk.W+tk.N+tk.S)
-        self.logWidget.grid(row=1, column=3, sticky=tk.E+tk.W+tk.N+tk.S)
-        self.chatInWidget.grid(row=2, column=1, sticky=tk.W + tk.E)
+        self.chatout.grid(row=1, column=1, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.log.grid(row=1, column=3, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.chatin.grid(row=2, column=1, sticky=tk.W + tk.E)
         self.button.grid(row=2, column=2, sticky=tk.E + tk.W)
-        self.diagram_frame.grid(row=1, column=4, columnspan=2, sticky=tk.E+tk.W+tk.N+tk.S)
-        self.infoLabel.grid(row=2, column=4, sticky=tk.E)
+        self.diagram_frame.grid(row=1, column=4, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.info_label.grid(row=2, column=4, sticky=tk.E)
         self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
         # set subscriber list (implements observer pattern)
+        self.controller = None
         self.subscribers = set()
 
     # the following two function implement the observer pattern
@@ -70,120 +66,100 @@ class Frame:
         self.controller = controller
 
     def notify_controller(self, event):
-        self.input = self.chatInWidget.get()
-        if self.input:
-            self.controller.handle_input(self.input)
+        print(event)
+        self.user_input = self.chatin.get()
+        if self.user_input:
+            self.controller.handle_input(self.user_input)
 
     def retrain_bot(self):
-        self.successMessage = self.bot.train()
+        self.bot.train()
 
     # prints in chatout widget
-    def updateChatOut(self, input, response):
+    def update_chatout(self, input, response):
         # prints input, empties input field
-        self.chatOutWidget.configure(state="normal")
-        self.chatOutWidget.insert(tk.END, "Du: " + input + "\n")
+        self.chatout.configure(state="normal")
+        self.chatout.insert(tk.END, "Du: " + input + "\n")
         # deletes text from index 0 till the end in input filed
-        self.chatInWidget.delete(0, tk.END)
+        self.chatin.delete(0, tk.END)
         # inserts chatbot answer in chat
-        self.chatOutWidget.insert(tk.END, self.cbName + ": " + response + "\n")
-        self.chatOutWidget.see(tk.END)
-        self.chatOutWidget.configure(state="disabled")
+        self.chatout.insert(tk.END, self.cb_name + ": " + response + "\n")
+        self.chatout.see(tk.END)
+        self.chatout.configure(state="disabled")
 
     # prints to the log widget, used to display additional text data (sentiment etc)
-    def updateLog(self, output):
-        # unlock widget, inster, lock widget
-        self.logWidget.configure(state="normal")
-        self.logWidget.delete(1.0, tk.END)
-        # print out emototional relevant word counts (normalized)
+    def update_log(self, output):
+        # unlock widget, insert, lock widget
+        self.log.configure(state="normal")
+        self.log.delete(1.0, tk.END)
+        # print out emotional relevant word counts (normalized)
         for item in output:
-            self.logWidget.insert(tk.END, item + "\n")
-        self.logWidget.configure(state="disabled")
+            self.log.insert(tk.END, item + "\n")
+        self.log.configure(state="disabled")
 
-    def update_diagram(self, state_data, history_data):
+    def update_diagrams(self, emotional_state, history_data):
         self.dgm.update_time_chart(history_data, self.diagram_canvas)
-        #self.dgm.update_radar_chart(self.new_time_data, self.diagram_canvas)
+        self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, self.diagram_canvas)
 
     def show(self):
         self.root.mainloop()
 
 
 class DiagramManager:
-
-    def __init__(self):
-        self.list_length = 5
-        # Bei allen Listen muss der erste Wert am Ende wiederholt werden, damit der Kreis einmal rum geht
-        self.polar_angles = [n / float(self.list_length) * 2 * np.pi for n in range(self.list_length)]
+    def __init__(self, init_emotional_state, init_emotional_history):
+        # Data that is needed to make the diagrams (labels, ticks, colors, etc)
+        self.polar_angles = [n / float(5) * 2 * np.pi for n in range(5)]
         self.polar_angles += self.polar_angles[:1]
-        # position and names for the markers on the x- and y-axis
-        self.xticks_labels = ["h", "s", "a", "f", "d"]
-        self.yticks_positions = [0.2, 0.4, 0.6, 0.8]
-        self.yticks_labels = [".2", ".4", ".6", ".8"]
+        self.polar_chart_yticks_positions = [0.2, 0.4, 0.6, 0.8]
+        self.polar_chart_yticks_labels = [".2", ".4", ".6", ".8"]
         self.time_chart_x_values = [0, -1, -2, -3, -4]
+        self.plot_colors = ["orange", "grey", "red", "blue", "green"]
+        self.plot_classes = ["hap", "sad", "ang", "fea", "dis"]
 
-        self.polar_data = None
-        self.time_plot1 = None
-        self.time_plot2 = None
-        self.time_plot3 = None
-        self.time_plot4 = None
-        self.time_plot5 = None
+        # 3D-lines that depict the development of the emotional state
+        self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5 = (None, None, None, None, None)
         self.polar_plot = None
-        self.time_chart_init = [
-            [0.5, 0, 0, 0, 0], # happiness
-            [0, 0.5, 0, 0, 0], # sadness
-            [0, 0, 0.5, 0, 0], # anger
-            [0, 0, 0, 0.5, 0], # fear
-            [0, 0, 0, 0, 0.5] # disguist
-        ]
+        self.bar_plot = None
 
-    def get_figure(self):
-        # create data to display in regular diagrams
+        # init figure and subplots/axes
+        self.fig, (self.ax3, self.ax4) = plt.subplots(nrows=2, ncols=1)
+        # self.fig, ((self.ax1, self.ax2), (self.ax3, self.ax4)) = plt.subplots(nrows=2, ncols=2)
+        # self.make_radar_chart(self.ax1, "Input emotions", 221, self.init_polar_data)
+        # self.make_radar_chart(self.ax2, "Input keywords", 222, self.init_polar_data)
+        self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
+        self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
+        self.fig.tight_layout()
 
-        self.time_data = [[-4, -3, -2, -1, 0], [0.7, 0.8, 0.75, 0.6, 0.7]]
-        self.time_data2 = [[-4, -3, -2, -1, 0], [0.1, 0.2, 0.1, 0.4, 0.3]]
-        self.bar_data = [0.1, 0.2, 0.1, 0.4, 0.3]
-        # Vorbereitung. Bei allen radar-Listen muss der erste Wert am Ende wiederholt werden, damit der Kreis einmal rum geht
-        self.polar_data = [0.1, 0.6, 0.3, 0.6, 0.5]
-        self.polar_data.append(self.polar_data[0])
-        self.x = np.arange(0, 3, .01)
-        self.y = np.sqrt(self.x)
-        self.z = np.exp(self.x)
-
-        # create figures and axes (kind of a subfigure)
-        self.fig, ((self.ax1, self.ax2), (self.ax3, self.ax4)) = plt.subplots(nrows=2, ncols=2)
-        self.make_radar_chart(self.ax1, "Input emotions", 221, self.polar_data)
-        self.make_radar_chart(self.ax2, "Input keyowords", 222, self.polar_data)
-        self.make_bar_chart(self.ax3, self.bar_data, "Hello title")
-        self.make_time_chart(self.ax4, "emotional status history")
-
+    def get_diagrams(self):
         return self.fig
 
-    def make_radar_chart(self, ax, title, position, polar_data):
-        # Erstelle radar chart
-        ax = plt.subplot(position, polar=True)
-        ax.set_title(title)
-        # Beschrifte die Achsen (x = der Kreis, y = die "Speichen"), ylim = limits der y-Achse
-        plt.xticks(self.polar_angles[:-1], self.xticks_labels, color='grey', size=10)
-        plt.yticks(self.yticks_positions, self.yticks_labels, color="grey", size=8)
-        ax.set_ylim(0, 1)
-        # Plot data und fülle die Fläche dazwischen aus
-        self.polar_plot, =ax.plot(self.polar_angles, polar_data, alpha=1, linewidth=.5)
-        ax.fill(self.polar_angles, polar_data, color='blue', alpha=0.1)
-
-    def make_bar_chart(self, ax, bar_data, title):
+    # create and update a bar chart
+    def make_bar_chart(self, ax, init_bar_data, title):
         ax.set_title(title)
         ax.set_ylim(0, 1)
-        ax.bar(self.xticks_labels, bar_data, width=.4, color="blue")
+        ax.yaxis.tick_right()
+        ax.grid(axis="y", linestyle=':', linewidth=.5)
+        ax.bar(self.plot_classes, init_bar_data, width=.9, color=self.plot_colors, alpha=.75)
 
-    def make_time_chart(self, ax, title):
+    def update_bar_chart(self, ax, emotional_state, canvas):
+        ax.clear()
+        self.make_bar_chart(ax, emotional_state, "bot emotional state")
+        canvas.draw()
+
+    # create and update a line chart
+    def make_time_chart(self, ax, init_time_data, title):
         ax.set_title(title)
         ax.yaxis.tick_right()
         ax.set_ylim(0, 1)
         ax.set_xlim(-4, 0)
-        self.time_plot1, = ax.plot(self.time_chart_x_values, self.time_chart_init[0], linewidth=.5)
-        self.time_plot2, = ax.plot(self.time_chart_x_values, self.time_chart_init[1], linewidth=.5)
-        self.time_plot3, = ax.plot(self.time_chart_x_values, self.time_chart_init[2], linewidth=.5)
-        self.time_plot4, = ax.plot(self.time_chart_x_values, self.time_chart_init[3], linewidth=.5)
-        self.time_plot5, = ax.plot(self.time_chart_x_values, self.time_chart_init[4], linewidth=.5)
+        ax.grid(axis="y", linestyle=':', linewidth=.5)
+        # Graphen plotten
+        self.time_plot1, = ax.plot(self.time_chart_x_values, [init_time_data[i][0] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[0])
+        self.time_plot2, = ax.plot(self.time_chart_x_values, [init_time_data[i][1] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[1])
+        self.time_plot3, = ax.plot(self.time_chart_x_values, [init_time_data[i][2] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[2])
+        self.time_plot4, = ax.plot(self.time_chart_x_values, [init_time_data[i][3] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[3])
+        self.time_plot5, = ax.plot(self.time_chart_x_values, [init_time_data[i][4] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[4])
+        # Legende erstellen
+        ax.legend((self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5), self.plot_classes, loc=2)
 
     def update_time_chart(self, time_data, diagram_canvas):
         self.time_plot1.set_ydata([time_data[i][0] for i in range(0, 5)])
@@ -191,18 +167,29 @@ class DiagramManager:
         self.time_plot3.set_ydata([time_data[i][2] for i in range(0, 5)])
         self.time_plot4.set_ydata([time_data[i][3] for i in range(0, 5)])
         self.time_plot5.set_ydata([time_data[i][4] for i in range(0, 5)])
-
         diagram_canvas.draw()
+
+    # create and update a radar chart
+    def make_radar_chart(self, ax, title, position, polar_data):
+        # Erstelle radar chart
+        ax = plt.subplot(position, polar=True)
+        ax.set_title(title)
+        # Beschrifte die Achsen (x = der Kreis, y = die "Speichen"), ylim = limits der y-Achse
+        plt.xticks(self.polar_angles[:-1], self.plot_classes, color='grey', size=10)
+        plt.yticks(self.polar_chart_yticks_positions, self.polar_chart_yticks_labels, color="grey", size=8)
+        ax.set_ylim(0, 1)
+        # Plot data und fülle die Fläche dazwischen aus
+        self.polar_plot, = ax.plot(self.polar_angles, polar_data, alpha=1, linewidth=5)
+        ax.fill(self.polar_angles, polar_data, color='blue', alpha=0.1)
 
     def update_radar_chart(self, new_data, canvas):
         new_data[0].append(new_data[0][0])
         new_data[1].append(new_data[1][0])
-        #self.polar_plot.set_data(new_data[0], new_data[1])
+        self.polar_plot.set_data(new_data[0], new_data[1])
         self.polar_plot.set_xdata(new_data[0])
         canvas.draw()
 
-
-
+    # old method
     def old(self):
         # tutorial commands for using axes/suplots etc
         # Benutze diese Methode für polar-Diagramme

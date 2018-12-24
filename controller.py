@@ -34,17 +34,19 @@ class Controller:
         self.bot.train()
         self.classifier = Classifier()
 
-        # create frame
-        self.frame = Frame(name, self.bot, self.emotion_titles, self.emotional_state)
+        # create frame and update widgets with initial values
+        self.frame = Frame(name, self.bot, self.emotional_state, self.emotional_history)
         self.frame.register(self)
+        #self.frame.update_diagram(self.emotional_state, self.character.get_emotional_history())
+        #self.handle_input("a")
         self.frame.show()
 
     # take user input, generate new data an update ui
-    def handle_input(self, input):
+    def handle_input(self, user_input):
         # get new values based in response
-        self.response = self.bot.respond(input)
-        self.input_emotions = self.classifier.get_emotions(input)
-        self.input_topics = self.classifier.get_topics(input, self.emo_keyword_categories)
+        self.response = self.bot.respond(user_input)
+        self.input_emotions = self.classifier.get_emotions(user_input)
+        self.input_topics = self.classifier.get_topics(user_input, self.emo_keyword_categories)
         self.response_confidence = self.response.confidence.__str__()
         self.emotional_state = self.character.update_emotional_state(self.input_emotions)
         self.emotional_history = self.character.update_emotional_history(self.emotional_state)
@@ -57,9 +59,9 @@ class Controller:
         self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.emotional_state))
 
         # update widgets
-        self.frame.updateChatOut(input, self.response.__str__())
-        self.frame.updateLog(self.log_message)
-        self.frame.update_diagram(self.emotional_state, self.character.get_emotional_history())
+        self.frame.update_chatout(user_input, self.response.__str__())
+        self.frame.update_log(self.log_message)
+        self.frame.update_diagrams(self.emotional_state, self.character.get_emotional_history())
 
     # combines to lists, eg: emotion names from one list and the respective values from another
     def combine_lists(self, title, list):

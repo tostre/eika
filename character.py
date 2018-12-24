@@ -1,7 +1,3 @@
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-
 # Idee: Der Charakter wird definiert durch:
 # 1. Die emo-listen (traits, max_val, act_val
 # 2. Welcher state-Wert durch welche anderen Werte beeinflusst wird
@@ -11,12 +7,11 @@ import matplotlib.pyplot as plt
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 class Character:
     def __init__(self, trait_values, max_values, act_values):
-        self.a = 1
         # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
         # this person gets mad real quick and overreacts to incoming emotions
         # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
-        self.act_values = act_values
         # trait_values are the min-value of an emotion
+        self.act_values = act_values
         self.trait_values = trait_values
         self.max_values = max_values
 
@@ -37,8 +32,6 @@ class Character:
             [0, 0, 0, 0, 0]
         ]
 
-        print(self.emotional_history)
-
         # Show which incoming (in am message) emotions affet the emotional state of the character
         # 0:/1:/.../4: happiness, sadness, anger, fear, disgust
         # [0,1,1,0,0]: Shows if these emotions affect the emotion in front of the []
@@ -50,6 +43,7 @@ class Character:
             3: [[0, 0, 1, 1, 1], [0, 0, 1, 1, 1]],
             4: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
         }
+
         # Show which of t
         # he emotional-state values affect the change of other state-values
         # eg: When you're mighty mad it's harder to make you happy, than if you're just a bit mad
@@ -89,12 +83,8 @@ class Character:
 
     def update_emotional_history(self, emotional_state):
         # Deletes the last entry in the list and copys the ones from the new emo_state to the front
-        #print("\n\n")
-        #print(self.emotional_history)
         self.emotional_history = self.emotional_history[:-1]
         self.emotional_history = [self.emotional_state.copy()] + self.emotional_history
-        print("histoy")
-        print(self.emotional_history)
         return self.emotional_history
 
 
