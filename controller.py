@@ -30,6 +30,10 @@ class Controller:
         self.emotional_state = self.character.get_emotional_state()
         self.emotional_history = self.character.get_emotional_history()
 
+        self.trait_vals = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
+        self.emotion_max_vals = np.array([0.95, 0.95, 0.95, 0.95, 0.95])
+        self.emotion_act_vals = np.array([1, 1, 1, 1, 1])
+
         # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.bot = Bot(name)
         self.bot.train()

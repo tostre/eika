@@ -6,7 +6,7 @@
 # Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 class Character:
-    def __init__(self, trait_values, max_values, act_values):
+    def __init__(self, trait_values, max_values, act_values, trait_vals, emotion_max_vals, emotion_act_vals):
         # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
         # this person gets mad real quick and overreacts to incoming emotions
         # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
@@ -14,6 +14,11 @@ class Character:
         self.act_values = act_values
         self.trait_values = trait_values
         self.max_values = max_values
+
+        # np-arrays
+        self.trait_vals = trait_vals
+        self.emotion_max_vals = emotion_max_vals
+        self.emotion_act_vals = emotion_act_vals
 
         # set emotional state to trait (aka min-) values
         self.emotional_state = [
