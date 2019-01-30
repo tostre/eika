@@ -22,17 +22,20 @@ class Controller:
         self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
         self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
+        #np
+        self.trait_vals = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
+        self.emotion_max_vals = np.array([0.95, 0.95, 0.95, 0.95, 0.95])
+        self.emotion_act_vals = np.array([1, 1, 1, 1, 1])
+
         # initialize character, val = currentValue, act = activationValue
         self.trait_values = [0.42, 0.13, 0.24, 0.02, 0.10]
         self.max_values = [0.92, 0.70, 0.44, 0.57, 0.61]
         self.act_values = [0.21, 0.12, 0.30, 0.05, 0.10]
-        self.character = Character(self.trait_values, self.max_values, self.act_values)
+        self.character = Character(self.trait_values, self.max_values, self.act_values, self.trait_vals, self.emotion_max_vals, self.emotion_act_vals)
         self.emotional_state = self.character.get_emotional_state()
         self.emotional_history = self.character.get_emotional_history()
 
-        self.trait_vals = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
-        self.emotion_max_vals = np.array([0.95, 0.95, 0.95, 0.95, 0.95])
-        self.emotion_act_vals = np.array([1, 1, 1, 1, 1])
+
 
         # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.bot = Bot(name)

@@ -5,6 +5,8 @@
 #    Input-Wert welchen emo-Wert wie beeinflusst
 # Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
+import numpy as np
+
 class Character:
     def __init__(self, trait_values, max_values, act_values, trait_vals, emotion_max_vals, emotion_act_vals):
         # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
@@ -28,6 +30,16 @@ class Character:
             self.trait_values[3],
             self.trait_values[4]]
 
+
+        # np
+        self.emo_state = np.array([
+            self.trait_vals[0],
+            self.trait_vals[1],
+            self.trait_vals[2],
+            self.trait_vals[3],
+            self.trait_vals[4],
+        ])
+
         # saves the last five emotional states, rows = jeweils ein zeitschritt, spalte=jeweils eine emotion
         self.emotional_history = [
             self.emotional_state.copy(),
@@ -36,6 +48,14 @@ class Character:
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0]
         ]
+
+        self.emo_history = np.array([
+            self.emo_state.copy(),
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
 
         # Show which incoming (in am message) emotions affet the emotional state of the character
         # 0:/1:/.../4: happiness, sadness, anger, fear, disgust
@@ -93,22 +113,69 @@ class Character:
         return self.emotional_history
 
 
+    def update_s(self, input_emotions):
+        # this methods applies the update_emotional_state functionality only to the h-value
+        # for testing and demonstration purposes
 
-    # Wichtige erkenntnisse: Negative emotionen überschatten positive (quellen)
-    # wenn man sauer oder traurig ist, denkt man nur noch an das negative
-    # deshalben sollten negative emotionen die positiven nach unten drücken
-    # (d.h. mehr effekt haben als die positiven, bzw. diese unterdrücken)
-    # außerdem sollten emotionen mit jedem zeitschritt (zB jede nachricht) abnehmen
 
-    # ich nehme surprise raus. Ist nur eine kurze reaktion auf ein event
-    # das müsste man ganz anders behandeln als den rest der emotionen
-    # es eignet sich außerdem nicht als personality trait
-    # emotioen treten nur als einzelne werte auf, nicht in einem vektor
-    # es können trotzdem mehrere emotionen zugleich auftreten
-    # das gleiche gilt für stimmungen
-    # Idee: Jede Emotion als Tupel beschreiben
-    # Die "Höhe der Emotion von 0 bis 1"
-    # Der Aktivierungswert: Beschreibt wie schnell sich diese Emotion aufbauen kann
+        # Array that holds all the deltas of the old/new values of the neg. emotions for the delta_mod
+        self.emotions_deltas = np.zeros(4)
+        self.neg_emotions_mean_delta = 0
+
+        # input_emotions are the emotional values detected in the user message by the classifier
+        self.input_emotions = np.array([0.3, 0.1, 0.05, 0.2, 0.0])
+
+        # the emotional state is the combination of all emotional values at a point in time
+        # all the old_ values are the current emotional state
+        self.old_values = np.copy(self.emotional_state)
+        self.new_values = np.zeros(5)
+        self.deltas = self.new_values - self.old_values
+
+        # the old_value of an emotion ist the value-state the bot is in before receiving the message
+        self.old_value = self.emotional_state[0]
+        self.new_value = 0
+        self.round_modifier = 0
+
+
+
+
+
+
+
+        # Apply input_mod
+        # Different people react differently to incoming emotions
+
+        # Apply delta_modifier
+        # Happiness raises if negative emotions in general shrink
+        # ordnet einem mean_delta den mod-Wert zu. Parameter der Funktion sind individuenabhängig
+        self.delta_function = np.array([0.5, 0])
+        # delete first element from deltas array, because only negative deltas affect this mod
+        self.deltas = np.delete(self.deltas, 0)
+        # calculate mean delta from the deltas of all negative emotione
+        self.mean_delta = np.mean(self.deltas)
+
+        if self.mean_delta < 0:
+            self.delta_mod = self.linear_function(self.mean_delta, self.delta_function)
+            print("delta_mod: " + self.delta_mod)
+        else:
+            self.delta_mod = 0
+            print("delta_mod: " + self.delta_mod)
+
+        # Apply decay_modifier
+        # Every emotion automatically reduces by 0.05 per round
+        # decay mod predict how much an emotion lowers per round, values depend on the individual
+        self.decay_mods = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
+        self.decay_mod = self.decay_mods[0]
+        print("decay mod: " + self.decay_mod)
+
+        # Apply state modifier
+        # Current emotional levels influence the influence a mod has on an emotion
+
+        # Round the value to two decimal points
+        self.new_value = np.round(self.new_value, 2)
+
+    def linear_function(self, x, function):
+        return (function[0] * x) + function[1]
 
 
 

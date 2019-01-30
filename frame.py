@@ -37,7 +37,7 @@ class Frame:
         self.chatin = tk.Entry(self.root)
         self.chatin.bind('<Return>', self.notify_controller)
         self.chatin.focus_set()
-        self.log = tk.Text(self.root, width=40, state="disabled")
+        self.log = tk.Text(self.root, width=30, state="disabled")
         self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
         self.button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
 
