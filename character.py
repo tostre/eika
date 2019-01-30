@@ -112,72 +112,67 @@ class Character:
         self.emotional_history = [self.emotional_state.copy()] + self.emotional_history
         return self.emotional_history
 
-
+    # update the emotional state, ie every emotion
     def update_s(self, input_emotions):
-        # this methods applies the update_emotional_state functionality only to the h-value
-        # for testing and demonstration purposes
+        # get the modifiers
+        self.input_mod = self.get_input_mod(input_emotions)
+        self.delta_mod = self.get_delta_mod()
+        self.decay_mod = self.get_decay_mod()
+        self.state_mod = self.get_state_mod()
 
+    # Apply input_mod
+    # Different people react differently to incoming emotions
+    def get_input_mod(self, input_emotions):
+        # the modifier ist half the input value in the example functions-array below, if its above 0.1 and below 1
+        # example: input_emotions is (0, 0.3, 0, 0, 0). Input mod would be: 0 + (-0,015) + 0 + 0 + 0 = -0,015
+        self.input_functions = np.array([(0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1)])
+        self.input_mod_0 = self.linear_function(input_emotions[0], self.input_functions[0])
+        self.input_mod_1 = self.linear_function(input_emotions[1], self.input_functions[1])
+        self.input_mod_2 = self.linear_function(input_emotions[2], self.input_functions[2])
+        self.input_mod_3 = self.linear_function(input_emotions[3], self.input_functions[3])
+        self.input_mod_4 = self.linear_function(input_emotions[4], self.input_functions[4])
+        return self.input_mod_1 + self.input_mod_2 + self.input_mod_3 + self.input_mod_4
 
-        # Array that holds all the deltas of the old/new values of the neg. emotions for the delta_mod
-        self.emotions_deltas = np.zeros(4)
-        self.neg_emotions_mean_delta = 0
-
-        # input_emotions are the emotional values detected in the user message by the classifier
-        self.input_emotions = np.array([0.3, 0.1, 0.05, 0.2, 0.0])
-
-        # the emotional state is the combination of all emotional values at a point in time
-        # all the old_ values are the current emotional state
-        self.old_values = np.copy(self.emotional_state)
-        self.new_values = np.zeros(5)
-        self.deltas = self.new_values - self.old_values
-
-        # the old_value of an emotion ist the value-state the bot is in before receiving the message
-        self.old_value = self.emotional_state[0]
-        self.new_value = 0
-        self.round_modifier = 0
-
-
-
-
-
-
-
-        # Apply input_mod
-        # Different people react differently to incoming emotions
-
-        # Apply delta_modifier
-        # Happiness raises if negative emotions in general shrink
+    # Apply delta_modifier
+    # Happiness raises if negative emotions in general shrink
+    def get_delta_mod(self):
         # ordnet einem mean_delta den mod-Wert zu. Parameter der Funktion sind individuenabhängig
-        self.delta_function = np.array([0.5, 0])
+        self.delta_function = np.array([0.5, 0, 0, 1])
         # delete first element from deltas array, because only negative deltas affect this mod
         self.deltas = np.delete(self.deltas, 0)
         # calculate mean delta from the deltas of all negative emotione
         self.mean_delta = np.mean(self.deltas)
 
         if self.mean_delta < 0:
-            self.delta_mod = self.linear_function(self.mean_delta, self.delta_function)
-            print("delta_mod: " + self.delta_mod)
+            return self.linear_function(self.mean_delta, self.delta_function)
         else:
-            self.delta_mod = 0
-            print("delta_mod: " + self.delta_mod)
+            return 0
 
-        # Apply decay_modifier
-        # Every emotion automatically reduces by 0.05 per round
+    # Apply decay_modifier
+    # Every emotion automatically reduces by 0.05 per round
+    def get_decay_mod(self):
         # decay mod predict how much an emotion lowers per round, values depend on the individual
         self.decay_mods = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
-        self.decay_mod = self.decay_mods[0]
-        print("decay mod: " + self.decay_mod)
+        return self.decay_mods[0]
 
-        # Apply state modifier
-        # Current emotional levels influence the influence a mod has on an emotion
+    # Apply state modifier
+    # Current emotional levels influence the influence a mod has on an emotion
+    def get_state_mod(self):
+        pass
 
-        # Round the value to two decimal points
-        self.new_value = np.round(self.new_value, 2)
 
     def linear_function(self, x, function):
-        return (function[0] * x) + function[1]
+        # a function is an array and built as such:
+        # f[0] = m (steigung), f[1] = b (Achsenabschnitt), f[2] = t (threshhold), f[3] = m (max-wert den die funktion annhemen kann)
+        self.function_result = (function[0] * x) + function[1]
 
-
+        # check if function result is within min (threshold) and max value
+        if self.function_result <= function[2]:
+            return 0
+        elif self.function_result >= function[3]:
+            return function[3]
+        else:
+            return self.function_result
 
 
     def get_emotional_state(self):

@@ -69,6 +69,8 @@ class Controller:
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.emotional_state, self.character.get_emotional_history())
 
+        self.character.update_s(self.input_emotions)
+
     # combines to lists, eg: emotion names from one list and the respective values from another
     def combine_lists(self, title, list):
         self.a = [title]
