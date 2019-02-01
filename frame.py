@@ -71,7 +71,6 @@ class Frame:
 
     def notify_controller(self, event):
         self.user_input = self.chatin.get()
-        print("not")
         if self.user_input:
             self.controller.handle_input(self.user_input)
 

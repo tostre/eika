@@ -6,39 +6,23 @@
 # Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 import numpy as np
+import math
+
 
 class Character:
-    def __init__(self, trait_values, max_values, act_values, trait_vals, emotion_max_vals, emotion_act_vals):
+    def __init__(self, emotions, trait_values, max_values, act_values):
         # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
         # this person gets mad real quick and overreacts to incoming emotions
         # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
         # trait_values are the min-value of an emotion
+        self.emotions = emotions
         self.act_values = act_values
         self.trait_values = trait_values
         self.max_values = max_values
+        self.emotional_state = self.trait_values.copy()
 
-        # np-arrays
-        self.trait_vals = trait_vals
-        self.emotion_max_vals = emotion_max_vals
-        self.emotion_act_vals = emotion_act_vals
-
-        # set emotional state to trait (aka min-) values
-        self.emotional_state = [
-            self.trait_values[0],
-            self.trait_values[1],
-            self.trait_values[2],
-            self.trait_values[3],
-            self.trait_values[4]]
-
-
-        # np
-        self.emo_state = np.array([
-            self.trait_vals[0],
-            self.trait_vals[1],
-            self.trait_vals[2],
-            self.trait_vals[3],
-            self.trait_vals[4],
-        ])
+        self.emotional_history = np.zeros((5, 5))
+        self.emotional_history[0] = self.emotional_state.copy()
 
         # saves the last five emotional states, rows = jeweils ein zeitschritt, spalte=jeweils eine emotion
         self.emotional_history = [
@@ -49,62 +33,111 @@ class Character:
             [0, 0, 0, 0, 0]
         ]
 
-        self.emo_history = np.array([
-            self.emo_state.copy(),
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ])
+        # empathy mod related variables
+        # gibt an wie eine emotion (zeile) von den andern emotionen (spalten) verändert wird
+        # Beisiel erste Reihen, erste Spalte: Der h-Wert des Bots steiert sich um den 0,2-fachen Wert des eingehenden h-Werts
+        # Es gibt keinen Threshhold und keinen max-Wert
+        # Beispiel zweite Reihe, erste Spalt: Wenn eine Nachricht reinkommt, wird deren 0,2facher-Happiness-Wert vom eigenen sad-Wert abgezogen
+        # aber nur wenn der Betrag des Wertes höher dem Threshhold von 0,1 ist
+        self.empathy_functions = [
+            # rows show the emotions having an influence on the line-emotion
+            [[0.05, 0, 0, 1], [0, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # lines show the emotion being influenced (happiness)
+            [[-0.05, 0, 0.1, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],  # sadness
+            [[-0.05, 0, 0.1, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # anger
+            [[0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],  # fear
+            [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]  # digust
+        ]
 
-        # Show which incoming (in am message) emotions affet the emotional state of the character
-        # 0:/1:/.../4: happiness, sadness, anger, fear, disgust
-        # [0,1,1,0,0]: Shows if these emotions affect the emotion in front of the []
-        # [0, 1,-1,1]: SHows if the emotion affects the emotion in front of the [] positivly/negatively
-        self.input_modifier = {
-            0: [[1, 0, 1, 0, 0], [1, 0, -1, 0, 0]],
-            1: [[1, 1, 0, 1, 0], [-1, 1, 0, 1, 0]],
-            2: [[1, 0, 1, 0, 0], [-1, 0, 1, 0, 0]],
-            3: [[0, 0, 1, 1, 1], [0, 0, 1, 1, 1]],
-            4: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
-        }
+        # decay mod related variables
+        # values predicting how much an emotional values lowers per round
+        self.decay_modifiers_values = np.array([-0.05, -0.05, -0.05, -0.05, -0.05])
 
-        # Show which of t
-        # he emotional-state values affect the change of other state-values
-        # eg: When you're mighty mad it's harder to make you happy, than if you're just a bit mad
-        self.state_modifier = {}
+        # state modifier related variables
+        # Array zeigt, welche Emotionen (Zeilen) von welchen anderen Emotionene (Spalten) mit einem hohen Wert gedämpft/verstärkt werden
+        # rows show the emotions having an influence on the line-emotion
+        # 1 = kein Einfluss, zw. 0 und 1 = dämpfender einfluss, >1 = verstärkender einfluss, <0 = sorgt für abbau anderer emotionen
+        # Die Werte können eingestellt werden, bzw. sind vom Charakter abhängig (sollten als Parameter in der init übergeben werden)
+        self.state_modifiers_values = [
+            [1, 1, 0.9, -1, 1],  # lines show the emotion being influenced (happiness)
+            [0.9, 1.1, 1.1, -1, 1],  # sadness
+            [0.9, 1.1, 1.1, -1, 1],  # anger
+            [0.9, 1.1, 1.1, -1, 1],  # fear
+            [0.9, 1.1, 1.1, -1, 1]  # disgust
+        ]
+        # Array speichert Wert, der sagt, ab welchem Wert ein state_Wert als "hoch" gilt
+        self.state_modifiers_threshold = 0.75
 
-        self.which_ones = []
-        self.how = []
+        # delta mod realated variables
+        # function that determinces how much happiness raises in relation to the lowering of the neg. emotions
+        self.delta_function = [-0.2, 0, 0, 1]
 
     def update_emotional_state(self, input_emotions):
-        self.input_emotions = input_emotions
-        self.input_emotions = [0.32, 0.12, 0.07, 0.73, 0.20]
-        self.emotion = 0
-        self.old_val = self.emotional_state[self.emotion]
+        # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
+        self.modifiers = np.zeros((5, 3))
+        # Saves the change for one emotion caused by all input emotions
+        self.current_emotion_empathy_modifiers = np.zeros(5)
 
-        # print(self.emotional_state)
+        # reapeat for every emotion the bot has (happiness, sadness, etc.)
+        for index, emotion in enumerate(self.emotions, start=0):
+            # Apply decay_modifier
+            # Every emotion automatically reduces by 0.05 per round
+            self.modifiers[index][1] = self.decay_modifiers_values[index]
 
-        # repeat for every of the 5 emotions that shall be affected
-        for index in range(len(self.input_modifier)):
-            # Extract two lists that show which emotions affect the current one and if the affetion is poistive/negative
-            self.which_ones = self.input_modifier[index][0]
-            self.how = self.input_modifier[index][1]
-            # print("\nemotion: " + index.__str__() + ", mods: " + self.input_modifier[index].__str__() + ", input: " + input_emotions.__str__() + ", act: " + self.act_values.__str__() + "\n")
+            # apply empathy modifier
+            # repeat for every emotion again, cause every emotion can have an infuence on all other emotions
+            for i, function in enumerate(self.empathy_functions[index], start=0):
+                # save all the influences on the currently checked emotion (outer loop) in an array
+                self.current_emotion_empathy_modifiers[i] = self.linear_function(input_emotions[i], function)
+            # sava the sum of all the single empathy mods in the modifier-array
+            self.modifiers[index][0] = sum(self.current_emotion_empathy_modifiers)
 
-            # repeat for every of the 5 emotion that affect the current emotion from loop 1
-            for index2 in range(len(self.which_ones)):
-                self. updater = input_emotions[index2] * self.which_ones[index2] * self.how[index2] * self.act_values[index]
-                self.emotional_state[index] = round((self.emotional_state[index]  + self.updater), 2)
+            # apply state modifier
+            # get the state_modifiers for this emotion (outer loop)
+            self.current_state_modifiers = self.state_modifiers_values[index].copy()
+            # Schaue durch die Liste der state_modifier für diese emotion (outer loop). Wenn der state der beeinflussenden
+            # emotion über dem threshhold ist, lasse den wert in der liste stehen, wenn nicht ersetze den mit 1.
+            for i, name in enumerate(self.current_state_modifiers, start=0):
+                if self.emotional_state[i] <= self.state_modifiers_threshold:
+                    self.current_state_modifiers[i] = 1
 
-                # check if the new value i not bigger or smaller than the max or trait values
-                if self.emotional_state[index] > self.max_values[index]:
-                    self.emotional_state[index] = self.max_values[index]
-                elif self.emotional_state[index] < self.trait_values[index]:
-                    self.emotional_state[index] = self.trait_values[index]
-                # print("Old_val: " + self.emotional_state[index].__str__() + ", updater: " + self.updater.__str__() + ", new val: " + self.emotional_state[index].__str__())
+            # berechne den duchschnitt der state modifier
+            self.state_modifier_mean = np.mean(self.current_state_modifiers[index])
+            # Multipiliere alle modifier (input, decay, etc.) mit dem durchschnitt des state modifiers für diese emotion
+            # Die emotionen die nicht über dem threshold sind, haben hier keinen einfluss, weil sie auf 1 gesetzt wurden
+            # d.h. bei der berechnung des durchschnitts wurden sie quasi schon rausgerechnet
+            self.modifiers[index] = self.modifiers[index] * self.state_modifier_mean
 
-        return self.emotional_state
+        # calculate the new emotional state
+        self.emotional_state_old = self.emotional_state.copy()
+        # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
+        self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
+
+        # apply delta modifier
+        self.delta_values = np.zeros(4)
+        self.deltas = self.emotional_state - self.emotional_state_old
+        # delete the first element because we only need the deltas of the nagitive emotions
+        self.deltas = np.delete(self.deltas, 0)
+        # calc the mean of the deltas
+        self.mean_delta = np.mean(self.deltas)
+        # check if the mean is below zero, ie the negative emotions shrunk
+        if self.mean_delta < 0:
+            # add the value of the delta function to the happiness value
+            self.emotional_state[0] += self.linear_function(self.mean_delta, self.delta_function)
+
+
+        print(self.emotional_state)
+        print(self.trait_values)
+        print(self.max_values)
+        # check if all emotions are in range of trait and max values
+        for index, value in enumerate(self.emotional_state, start=0):
+            if value < self.trait_values[index]:
+                print("too small: " + index.__str__() + ", " + value.__str__() + ", " + self.trait_values[index].__str__())
+                self.emotional_state[index] = self.trait_values[index]
+            elif value > self.max_values[index]:
+                print("too small: " + index.__str__() + ", " + value.__str__() + ", " + self.max_values[index].__str__())
+                self.emotional_state[index] = self.max_values[index]
+
+        return np.round(self.emotional_state, 3)
 
     def update_emotional_history(self, emotional_state):
         # Deletes the last entry in the list and copys the ones from the new emo_state to the front
@@ -112,78 +145,24 @@ class Character:
         self.emotional_history = [self.emotional_state.copy()] + self.emotional_history
         return self.emotional_history
 
-    # update the emotional state, ie every emotion
-    def update_s(self, input_emotions):
-        # get the modifiers
-        self.input_mod = self.get_input_mod(input_emotions)
-        self.delta_mod = self.get_delta_mod()
-        self.decay_mod = self.get_decay_mod()
-        self.state_mod = self.get_state_mod()
-
-    # Apply input_mod
-    # Different people react differently to incoming emotions
-    def get_input_mod(self, input_emotions):
-        # the modifier ist half the input value in the example functions-array below, if its above 0.1 and below 1
-        # example: input_emotions is (0, 0.3, 0, 0, 0). Input mod would be: 0 + (-0,015) + 0 + 0 + 0 = -0,015
-        self.input_functions = np.array([(0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1), (-0.05, 0, 0.1, 1)])
-        self.input_mod_0 = self.linear_function(input_emotions[0], self.input_functions[0])
-        self.input_mod_1 = self.linear_function(input_emotions[1], self.input_functions[1])
-        self.input_mod_2 = self.linear_function(input_emotions[2], self.input_functions[2])
-        self.input_mod_3 = self.linear_function(input_emotions[3], self.input_functions[3])
-        self.input_mod_4 = self.linear_function(input_emotions[4], self.input_functions[4])
-        return self.input_mod_1 + self.input_mod_2 + self.input_mod_3 + self.input_mod_4
-
-    # Apply delta_modifier
-    # Happiness raises if negative emotions in general shrink
-    def get_delta_mod(self):
-        # ordnet einem mean_delta den mod-Wert zu. Parameter der Funktion sind individuenabhängig
-        self.delta_function = np.array([0.5, 0, 0, 1])
-        # delete first element from deltas array, because only negative deltas affect this mod
-        self.deltas = np.delete(self.deltas, 0)
-        # calculate mean delta from the deltas of all negative emotione
-        self.mean_delta = np.mean(self.deltas)
-
-        if self.mean_delta < 0:
-            return self.linear_function(self.mean_delta, self.delta_function)
-        else:
-            return 0
-
-    # Apply decay_modifier
-    # Every emotion automatically reduces by 0.05 per round
-    def get_decay_mod(self):
-        # decay mod predict how much an emotion lowers per round, values depend on the individual
-        self.decay_mods = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
-        return self.decay_mods[0]
-
-    # Apply state modifier
-    # Current emotional levels influence the influence a mod has on an emotion
-    def get_state_mod(self):
-        pass
-
-
     def linear_function(self, x, function):
         # a function is an array and built as such:
         # f[0] = m (steigung), f[1] = b (Achsenabschnitt), f[2] = t (threshhold), f[3] = m (max-wert den die funktion annhemen kann)
         self.function_result = (function[0] * x) + function[1]
 
         # check if function result is within min (threshold) and max value
-        if self.function_result <= function[2]:
+        if abs(self.function_result) <= function[2]:
             return 0
-        elif self.function_result >= function[3]:
+        elif abs(self.function_result) >= function[3]:
             return function[3]
         else:
             return self.function_result
-
 
     def get_emotional_state(self):
         return self.emotional_state
 
     def get_emotional_history(self):
         return self.emotional_history
-
-
-
-
 
 # sentiment analysis
 # liu et al 2003

@@ -17,21 +17,17 @@ class Controller:
         self.response_confidence = None
 
         # initialize emotional variables
-        self.emotion_titles = ["happiness", "sadness", "anger", "fear", "disgust"]
+        self.emotions = ["happiness", "sadness", "anger", "fear", "disgust"]
+        self.emotions_short = ["h", "s", "a", "f", "d"]
         self.emo_keyword_categories = ["joy", "sadness", "anger", "fear", "disgust"]
         self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
         self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
-        #np
-        self.trait_vals = np.array([0.05, 0.05, 0.05, 0.05, 0.05])
-        self.emotion_max_vals = np.array([0.95, 0.95, 0.95, 0.95, 0.95])
-        self.emotion_act_vals = np.array([1, 1, 1, 1, 1])
-
         # initialize character, val = currentValue, act = activationValue
-        self.trait_values = [0.42, 0.13, 0.24, 0.02, 0.10]
-        self.max_values = [0.92, 0.70, 0.44, 0.57, 0.61]
+        self.trait_values = [0.1, 0.1, 0.1, 0.1, 0.1]
+        self.max_values = [0.9, 0.9, 0.9, 0.9, 0.9]
         self.act_values = [0.21, 0.12, 0.30, 0.05, 0.10]
-        self.character = Character(self.trait_values, self.max_values, self.act_values, self.trait_vals, self.emotion_max_vals, self.emotion_act_vals)
+        self.character = Character(self.emotions, self.trait_values, self.max_values, self.act_values)
         self.emotional_state = self.character.get_emotional_state()
         self.emotional_history = self.character.get_emotional_history()
 
@@ -64,18 +60,21 @@ class Controller:
         self.log_message.append("\nBot response confidence:\nconfidence " + self.response_confidence)
         self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.emotional_state))
 
+        # test: numpy-arrays lassen sich genauso verwenden wie normale arrays
+        self.emotional_state = np.array(self.emotional_state)
+
         # update widgets
         self.frame.update_chatout(user_input, self.response.__str__())
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.emotional_state, self.character.get_emotional_history())
 
-        self.character.update_s(self.input_emotions)
+        #self.character.update_s(self.input_emotions)
 
     # combines to lists, eg: emotion names from one list and the respective values from another
     def combine_lists(self, title, list):
         self.a = [title]
         for item in range(0, 5):
-            self.a.append(self.emotion_titles[item] + ": " + list[item].__str__())
+            self.a.append(self.emotions[item] + ": " + list[item].__str__())
         return self.a
 
 
