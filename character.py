@@ -10,13 +10,11 @@ import math
 
 
 class Character:
-    def __init__(self, emotions, trait_values, max_values, act_values):
-        # act_val depicts how strongly an emotion is influenced by other emotions. A high anger_act_val means that
+    def __init__(self, emotions, trait_values, max_values):
         # this person gets mad real quick and overreacts to incoming emotions
         # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
         # trait_values are the min-value of an emotion
         self.emotions = emotions
-        self.act_values = act_values
         self.trait_values = trait_values
         self.max_values = max_values
         self.emotional_state = self.trait_values.copy()
@@ -54,9 +52,7 @@ class Character:
 
         # state modifier related variables
         # Array zeigt, welche Emotionen (Zeilen) von welchen anderen Emotionene (Spalten) mit einem hohen Wert gedämpft/verstärkt werden
-        # rows show the emotions having an influence on the line-emotion
         # 1 = kein Einfluss, zw. 0 und 1 = dämpfender einfluss, >1 = verstärkender einfluss, <0 = sorgt für abbau anderer emotionen
-        # Die Werte können eingestellt werden, bzw. sind vom Charakter abhängig (sollten als Parameter in der init übergeben werden)
         self.state_modifiers_values = [
             [1, 1, 0.9, -1, 1],  # lines show the emotion being influenced (happiness)
             [0.9, 1.1, 1.1, -1, 1],  # sadness
@@ -71,11 +67,30 @@ class Character:
         # function that determinces how much happiness raises in relation to the lowering of the neg. emotions
         self.delta_function = [-0.2, 0, 0, 1]
 
+        # relationship modifier
+        # saves the kind of relationship the bot has with the user (love/family, friend, neutral, dislike)
+        self.relationship_status = "friendship"
+        # values impacting the input_emotions (better relationsnship makes you more empathic
+        self.relationship_modifiers = {
+            "love": 1.3,
+            "friendship": 1.2,
+            "neutral": 1,
+            "dislike": 0.3
+        }
+
     def update_emotional_state(self, input_emotions):
+        self.input_emotions = np.array(input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
         self.modifiers = np.zeros((5, 3))
         # Saves the change for one emotion caused by all input emotions
         self.current_emotion_empathy_modifiers = np.zeros(5)
+
+        # apply relationship modifier
+        # the better the relationship the more empathic you are and take the input seriously
+        # check if the inserted relationship status is in the list of relationship modifiers
+        if self.relationship_status in self.relationship_modifiers:
+            # multiply the inputs with the relationship modifier
+            self.input_emotions *= self.relationship_modifiers[self.relationship_status]
 
         # reapeat for every emotion the bot has (happiness, sadness, etc.)
         for index, emotion in enumerate(self.emotions, start=0):
@@ -87,7 +102,7 @@ class Character:
             # repeat for every emotion again, cause every emotion can have an infuence on all other emotions
             for i, function in enumerate(self.empathy_functions[index], start=0):
                 # save all the influences on the currently checked emotion (outer loop) in an array
-                self.current_emotion_empathy_modifiers[i] = self.linear_function(input_emotions[i], function)
+                self.current_emotion_empathy_modifiers[i] = self.linear_function(self.input_emotions[i], function)
             # sava the sum of all the single empathy mods in the modifier-array
             self.modifiers[index][0] = sum(self.current_emotion_empathy_modifiers)
 
@@ -99,7 +114,6 @@ class Character:
             for i, name in enumerate(self.current_state_modifiers, start=0):
                 if self.emotional_state[i] <= self.state_modifiers_threshold:
                     self.current_state_modifiers[i] = 1
-
             # berechne den duchschnitt der state modifier
             self.state_modifier_mean = np.mean(self.current_state_modifiers[index])
             # Multipiliere alle modifier (input, decay, etc.) mit dem durchschnitt des state modifiers für diese emotion
@@ -113,10 +127,8 @@ class Character:
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
 
         # apply delta modifier
-        self.delta_values = np.zeros(4)
-        self.deltas = self.emotional_state - self.emotional_state_old
         # delete the first element because we only need the deltas of the nagitive emotions
-        self.deltas = np.delete(self.deltas, 0)
+        self.deltas = np.delete(self.emotional_state - self.emotional_state_old, 0)
         # calc the mean of the deltas
         self.mean_delta = np.mean(self.deltas)
         # check if the mean is below zero, ie the negative emotions shrunk
@@ -124,17 +136,11 @@ class Character:
             # add the value of the delta function to the happiness value
             self.emotional_state[0] += self.linear_function(self.mean_delta, self.delta_function)
 
-
-        print(self.emotional_state)
-        print(self.trait_values)
-        print(self.max_values)
         # check if all emotions are in range of trait and max values
         for index, value in enumerate(self.emotional_state, start=0):
             if value < self.trait_values[index]:
-                print("too small: " + index.__str__() + ", " + value.__str__() + ", " + self.trait_values[index].__str__())
                 self.emotional_state[index] = self.trait_values[index]
             elif value > self.max_values[index]:
-                print("too small: " + index.__str__() + ", " + value.__str__() + ", " + self.max_values[index].__str__())
                 self.emotional_state[index] = self.max_values[index]
 
         return np.round(self.emotional_state, 3)

@@ -18,20 +18,16 @@ class Controller:
 
         # initialize emotional variables
         self.emotions = ["happiness", "sadness", "anger", "fear", "disgust"]
-        self.emotions_short = ["h", "s", "a", "f", "d"]
         self.emo_keyword_categories = ["joy", "sadness", "anger", "fear", "disgust"]
         self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
         self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
         # initialize character, val = currentValue, act = activationValue
-        self.trait_values = [0.1, 0.1, 0.1, 0.1, 0.1]
-        self.max_values = [0.9, 0.9, 0.9, 0.9, 0.9]
-        self.act_values = [0.21, 0.12, 0.30, 0.05, 0.10]
-        self.character = Character(self.emotions, self.trait_values, self.max_values, self.act_values)
+        self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
+        self.max_values = [0.900, 0.900, 0.900, 0.900, 0.900]
+        self.character = Character(self.emotions, self.trait_values, self.max_values)
         self.emotional_state = self.character.get_emotional_state()
         self.emotional_history = self.character.get_emotional_history()
-
-
 
         # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.bot = Bot(name)
@@ -78,6 +74,6 @@ class Controller:
         return self.a
 
 
-# ein tf- oder pytrch-model ist egentlich die gewichte in dem neuronalen netz
+
 
 controller = Controller("bot")
