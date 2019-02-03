@@ -5,10 +5,10 @@ from classifier import Classifier
 import numpy as np
 
 
-# controller class, every subsystem is initialized and called here
+# controller class, every subsystem is initialized, and passed down to the classes that need them here
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
-    def __init__(self, name):
+    def __init__(self):
         # intialize chat variables
         self.response = None
         self.log_message = []
@@ -22,7 +22,7 @@ class Controller:
         self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
         self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
-        # initialize character, val = currentValue, act = activationValue
+        # initialize character, val = currentValue
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
         self.max_values = [0.900, 0.900, 0.900, 0.900, 0.900]
         self.character = Character(self.emotions, self.trait_values, self.max_values)
@@ -30,12 +30,13 @@ class Controller:
         self.emotional_history = self.character.get_emotional_history()
 
         # create bot, responsoble for generating answers and classfifer, for analysing the input
-        self.bot = Bot(name)
-        self.bot.train()
+        self.name = "ChotterBotter"
         self.classifier = Classifier()
+        self.bot = Bot(self.name, self.character, self.classifier)
+        self.bot.train()
 
         # create frame and update widgets with initial values
-        self.frame = Frame(name, self.bot, self.emotional_state, self.emotional_history)
+        self.frame = Frame(self.name, self.bot, self.emotional_state, self.emotional_history)
         self.frame.register(self)
         self.frame.show()
 
@@ -74,6 +75,4 @@ class Controller:
         return self.a
 
 
-
-
-controller = Controller("bot")
+controller = Controller()

@@ -6,9 +6,13 @@ from chatterbot.trainers import ListTrainer
 # this class only generates outputs for a given user input. Based on the chatterbot library
 class Bot:
     # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
-    def __init__(self, name):
-        self.response = None
+    def __init__(self, name, character, classifier):
         self.name = name
+        self.character = character
+        self.classifier = classifier
+
+        self.response = None
+
 
         self.bot = cb.ChatBot(
             name,
