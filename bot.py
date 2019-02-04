@@ -36,5 +36,20 @@ class Bot:
     # returns chatbot response, with some additional data
     def respond(self, input):
         self.response = self.bot.get_response(input)
+        print(type(self.response))
+
+        self.r = {
+            "response_text": "",
+            "response_confidence": "",
+            "input_emotions": "",
+            "input_topics": ""
+        }
+
+        self.bot_state = {
+            "emotional_state": "",
+            "emotional_history": ""
+        }
+
+
         # self.response.add_extra_data("topics", self.classifier.get_topics(input))
         return self.response
