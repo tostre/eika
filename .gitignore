@@ -1,3 +1,4 @@
 **/.idea
 **/__pycache__
 __pycache__/bot.cpython-36.pyc
+/db.sqlite3
