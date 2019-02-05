@@ -18,9 +18,9 @@ class Controller:
 
         # initialize emotional variables
         self.emotions = ["happiness", "sadness", "anger", "fear", "disgust"]
-        self.emo_keyword_categories = ["joy", "sadness", "anger", "fear", "disgust"]
-        self.pos_sentiment_keyword_categories = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
-        self.neg_sentiment_keyword_categories = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
+        self.topic_keywords = ["joy", "sadness", "anger", "fear", "disgust"]
+        self.topic_keywords_pos_sentiment = ["positive_emotion", "optimism", "affection", "cheerfulness", "politeness", "love", "attractive"]
+        self.topic_keywords_neg_sentiment = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
         # initialize character, val = currentValue
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
@@ -31,7 +31,7 @@ class Controller:
 
         # create bot, responsoble for generating answers and classfifer, for analysing the input
         self.name = "ChotterBotter"
-        self.classifier = Classifier()
+        self.classifier = Classifier(self.topic_keywords)
         self.bot = Bot(self.name, self.character, self.classifier)
         self.bot.train()
 
@@ -41,16 +41,28 @@ class Controller:
         self.frame.show()
 
     # take user input, generate new data an update ui
-    def handle_input(self, user_input):
+    def handle_input(self, user_message):
         # get new values based in response
-        self.response = self.bot.respond(user_input)
-        self.input_emotions = self.classifier.get_emotions(user_input)
-        self.input_topics = self.classifier.get_topics(user_input, self.emo_keyword_categories)
-        self.response_confidence = self.response.confidence.__str__()
-        self.emotional_state = self.character.update_emotional_state(self.input_emotions)
-        self.emotional_history = self.character.update_emotional_history(self.emotional_state)
-        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.input_emotions))
+        self.response_package, self.bot_state_package = self.bot.respond(user_message)
 
+        self.response = self.response_package.get("response")
+        self.response_confidence = self.response_package.get("response_confidence").__str__()
+        self.input_emotions = self.response_package.get("input_emotions")
+        self.input_topics = self.response_package.get("input_topics")
+
+
+
+
+       # self.emotional_state = self.character.update_emotional_state(self.input_emotions)
+        self. emotional_state = self.bot_state_package.get("emotional_state")
+        #self.emotional_history = self.character.update_emotional_history(self.emotional_state)
+        self.emotional_history = self.bot_state_package.get("emotional_history")
+
+
+
+
+
+        self.log_message.extend(self.combine_lists("\nBot emotional state: ", self.input_emotions))
         # append log message
         self.log_message = self.combine_lists("Input emotion analysis: ", self.input_emotions)
         self.log_message.extend(self.combine_lists("\nInput keyword analysis: ", self.input_topics))
@@ -61,11 +73,11 @@ class Controller:
         self.emotional_state = np.array(self.emotional_state)
 
         # update widgets
-        self.frame.update_chatout(user_input, self.response.__str__())
+        self.frame.update_chatout(user_message, self.response.__str__())
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.emotional_state, self.character.get_emotional_history())
 
-        #self.character.update_s(self.input_emotions)
+
 
     # combines to lists, eg: emotion names from one list and the respective values from another
     def combine_lists(self, title, list):

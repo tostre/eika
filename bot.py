@@ -1,23 +1,20 @@
 import chatterbot as cb
 from chatterbot.trainers import ChatterBotCorpusTrainer
-from chatterbot.trainers import ListTrainer
 import logging
 
 
-# this class only generates outputs for a given user input. Based on the chatterbot library
+# this analyzes user inputs and generates a response
 class Bot:
-    # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
     def __init__(self, name, character, classifier):
         # this is so i dont get a minor error message every turn
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
-
+        # identity of the bot
         self.name = name
         self.character = character
         self.classifier = classifier
 
         self.response = None
-
 
         self.bot = cb.ChatBot(
             name,
@@ -25,35 +22,30 @@ class Bot:
                 'chatterbot.preprocessors.clean_whitespace'
             ]
         )
-        # self.bot.set_trainer(ChatterBotCorpusTrainer)
-        #self.bot.set_trainer(ListTrainer)
-
-
 
     def train(self):
         trainer = ChatterBotCorpusTrainer(self.bot)
         trainer.train("chatterbot.corpus.english.conversations")
-        # self.bot.train("chatterbot.corpus.english")
-        print("bot trained")
         return "Training complete"
 
     # returns chatbot response, with some additional data
-    def respond(self, input):
-        self.response = self.bot.get_response(input)
-        print(type(self.response))
+    def respond(self, user_message):
+        self.response = self.bot.get_response(user_message)
 
-        self.r = {
-            "response_text": "",
-            "response_confidence": "",
-            "input_emotions": "",
-            "input_topics": ""
+
+        self.response_package = {
+            "response": self.response,
+            "response_confidence": self.response.confidence,
+            "input_emotions": self.classifier.get_emotions(user_message),
+            "input_topics": self.classifier.get_topics(user_message),
         }
 
-        self.bot_state = {
-            "emotional_state": "",
-            "emotional_history": ""
+        self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
+
+        self.bot_state_package = {
+            "emotional_state": self.emotional_state,
+            "emotional_history": self.emotional_history
         }
 
 
-        # self.response.add_extra_data("topics", self.classifier.get_topics(input))
-        return self.response
+        return self.response_package, self.bot_state_package

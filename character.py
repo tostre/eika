@@ -19,9 +19,6 @@ class Character:
         self.max_values = max_values
         self.emotional_state = self.trait_values.copy()
 
-        self.emotional_history = np.zeros((5, 5))
-        self.emotional_history[0] = self.emotional_state.copy()
-
         # saves the last five emotional states, rows = jeweils ein zeitschritt, spalte=jeweils eine emotion
         self.emotional_history = [
             self.emotional_state.copy(),
@@ -30,6 +27,10 @@ class Character:
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0]
         ]
+
+        self.emotional_history = np.zeros((5, 5))
+        self.emotional_history[0] = self.emotional_state.copy()
+        print("history init: " + self.emotional_history.__str__())
 
         # empathy mod related variables
         # gibt an wie eine emotion (zeile) von den andern emotionen (spalten) verändert wird
@@ -143,14 +144,16 @@ class Character:
             elif value > self.max_values[index]:
                 self.emotional_state[index] = self.max_values[index]
 
-        return np.round(self.emotional_state, 3)
+        # Round emotional state values so they can be used for further calculations
+        self.emotional_state = np.round(self.emotional_state, 3)
+        # update emotional history
+        # inserts emotional state at position 0 on axis 0 into emotional_history
+        self.emotional_history = np.insert(self.emotional_history, 0, self.emotional_state, 0)
+        self.emotional_history = np.delete(self.emotional_history, 4, 0)
 
-    def update_emotional_history(self, emotional_state):
-        # Deletes the last entry in the list and copys the ones from the new emo_state to the front
-        self.emotional_history = self.emotional_history[:-1]
-        self.emotional_history = [self.emotional_state.copy()] + self.emotional_history
-        return self.emotional_history
+        return self.emotional_state, self.emotional_history
 
+    # Returns the calculation of a linear function
     def linear_function(self, x, function):
         # a function is an array and built as such:
         # f[0] = m (steigung), f[1] = b (Achsenabschnitt), f[2] = t (threshhold), f[3] = m (max-wert den die funktion annhemen kann)

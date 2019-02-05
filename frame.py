@@ -91,7 +91,6 @@ class Frame:
         # unlock widget, insert, lock widget
         self.log.configure(state="normal")
         self.log.delete(1.0, tk.END)
-        # print out emotional relevant word counts (normalized)
         for item in output:
             self.log.insert(tk.END, item + "\n")
         self.log.configure(state="disabled")

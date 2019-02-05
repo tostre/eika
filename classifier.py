@@ -10,16 +10,17 @@ import empath
 import random
 
 class Classifier:
-    def __init__(self):
+    def __init__(self, topic_keywords):
         self.lexicon = empath.Empath()
         self.keyword_analysis = []
         self.emotion_analysis = []
+        self.topic_keywords = topic_keywords
 
     # analyzes and returns topics of the input using empath
-    def get_topics(self, input, keyword_categories):
+    def get_topics(self, user_message):
         self.keyword_analysis = []
-        self.topics_set = self.lexicon.analyze(input, categories=keyword_categories, normalize=True)
-        for item in keyword_categories:
+        self.topics_set = self.lexicon.analyze(user_message, categories=self.topic_keywords, normalize=True)
+        for item in self.topic_keywords:
             self.keyword_analysis.append(round(self.topics_set[item], 2).__str__())
         return self.keyword_analysis
 
