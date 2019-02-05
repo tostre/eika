@@ -1,12 +1,17 @@
 import chatterbot as cb
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import ListTrainer
+import logging
 
 
 # this class only generates outputs for a given user input. Based on the chatterbot library
 class Bot:
     # im Prinzip der Konstruktor, self ist die Instanz als Objekt (denke: this in Java)
     def __init__(self, name, character, classifier):
+        # this is so i dont get a minor error message every turn
+        logger = logging.getLogger()
+        logger.setLevel(logging.CRITICAL)
+
         self.name = name
         self.character = character
         self.classifier = classifier
@@ -21,14 +26,13 @@ class Bot:
             ]
         )
         # self.bot.set_trainer(ChatterBotCorpusTrainer)
-        self.bot.set_trainer(ListTrainer)
+        #self.bot.set_trainer(ListTrainer)
+
+
 
     def train(self):
-        self.bot.train([
-            "Hi, can I help you?",
-            "Sure, I'd like to book a flight to Iceland.",
-            "Your flight has been booked."
-        ])
+        trainer = ChatterBotCorpusTrainer(self.bot)
+        trainer.train("chatterbot.corpus.english.conversations")
         # self.bot.train("chatterbot.corpus.english")
         print("bot trained")
         return "Training complete"
