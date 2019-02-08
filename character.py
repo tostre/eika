@@ -10,27 +10,39 @@ import math
 
 
 class Character:
-    def __init__(self, emotions, trait_values, max_values):
-        # this person gets mad real quick and overreacts to incoming emotions
-        # if an incoming emotion affects the corresponding character-emotion act_val serves as kind of an empathy-value
-        # trait_values are the min-value of an emotion
+    def __init__(self, emotions, first_launch):
+        # for an explanation of all the variables, see self.reset_to_defaults
+
+        print(first_launch)
+        if first_launch:
+            self.reset_to_defaults()
+        else:
+            print("load")
+            self.character_npz = np.load("character.npz")
+            self.trait_values = self.character_npz.get("trait_values")
+            self.max_values = self.character_npz.get("max_values")
+            self.emotional_state = self.character_npz.get("emotional_state")
+            self.emotional_history = self.character_npz.get("emotional_history")
+            self.empathy_functions = self.character_npz.get("empathy_functions")
+            self.decay_modifiers_values = self.character_npz.get("decay_modifiers_values")
+            self.state_modifiers_values = self.character_npz.get("state_modifiers_values")
+            self.state_modifiers_threshold = self.character_npz.get("state_modifiers_threshold")
+            self.delta_function = self.character_npz.get("delta_function")
+            self.relationship_status = self.character_npz.get("relationship_status")
+            self.relationship_modifiers = self.character_npz.get("relationship_modifiers")
+
         self.emotions = emotions
-        self.trait_values = trait_values
-        self.max_values = max_values
+
+
+    def reset_to_defaults(self):
+        print("reset")
+        self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
+        self.max_values = [0.900, 0.900, 0.900, 0.900, 0.900]
         self.emotional_state = self.trait_values.copy()
 
         # saves the last five emotional states, rows = jeweils ein zeitschritt, spalte=jeweils eine emotion
-        self.emotional_history = [
-            self.emotional_state.copy(),
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0]
-        ]
-
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
-        print("history init: " + self.emotional_history.__str__())
 
         # empathy mod related variables
         # gibt an wie eine emotion (zeile) von den andern emotionen (spalten) verändert wird
@@ -38,14 +50,13 @@ class Character:
         # Es gibt keinen Threshhold und keinen max-Wert
         # Beispiel zweite Reihe, erste Spalt: Wenn eine Nachricht reinkommt, wird deren 0,2facher-Happiness-Wert vom eigenen sad-Wert abgezogen
         # aber nur wenn der Betrag des Wertes höher dem Threshhold von 0,1 ist
-        self.empathy_functions = [
-            # rows show the emotions having an influence on the line-emotion
+        self.empathy_functions = np.array([
             [[0.05, 0, 0, 1], [0, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # lines show the emotion being influenced (happiness)
             [[-0.05, 0, 0.1, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],  # sadness
             [[-0.05, 0, 0.1, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # anger
             [[0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],  # fear
             [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]  # digust
-        ]
+        ])
 
         # decay mod related variables
         # values predicting how much an emotional values lowers per round
@@ -78,6 +89,23 @@ class Character:
             "neutral": 1,
             "dislike": 0.3
         }
+
+        np.savez("character",
+                 trait_values=self.trait_values,
+                 max_values=self.max_values,
+                 emotional_state=self.emotional_state,
+                 emotional_history=self.emotional_history,
+                 empathy_functions=self.empathy_functions,
+                 decay_modifiers_values=self.decay_modifiers_values,
+                 state_modifiers_values=self.state_modifiers_values,
+                 state_modifiers_threshold=self.state_modifiers_threshold,
+                 delta_function=self.delta_function,
+                 relationship_status=self.relationship_status,
+                 relationship_modifiers=self.relationship_modifiers)
+
+    def save_state(self):
+        pass
+
 
     def update_emotional_state(self, input_emotions):
         self.input_emotions = np.array(input_emotions)

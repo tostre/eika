@@ -3,13 +3,21 @@ from bot import Bot
 from character import Character
 from classifier import Classifier
 import numpy as np
-
+from configparser import  SafeConfigParser
+import configparser
+import pickle
 
 # controller class, every subsystem is initialized, and passed down to the classes that need them here
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
-        # intialize chat variables
+        # read config file and save values in variables
+        self.config = configparser.ConfigParser()
+        self.config.read("settings.ini")
+        self.name = self.config.get("default", "botname")
+        self.first_launch = self.config.getboolean("default", "firstlaunch")
+
+        # initialize chat variables
         self.response = None
         self.log_message = []
         self.input_emotions = []
@@ -23,14 +31,11 @@ class Controller:
         self.topic_keywords_neg_sentiment = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
         # initialize character, val = currentValue
-        self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
-        self.max_values = [0.900, 0.900, 0.900, 0.900, 0.900]
-        self.character = Character(self.emotions, self.trait_values, self.max_values)
+        self.character = Character(self.emotions, self.first_launch)
         self.emotional_state = self.character.get_emotional_state()
         self.emotional_history = self.character.get_emotional_history()
 
-        # create bot, responsoble for generating answers and classfifer, for analysing the input
-        self.name = "ChotterBotter"
+        # create bot, responsible for generating answers and classififer, for analysing the input
         self.classifier = Classifier(self.topic_keywords)
         self.bot = Bot(self.name, self.character, self.classifier)
         self.bot.train()
@@ -39,6 +44,20 @@ class Controller:
         self.frame = Frame(self.name, self.bot, self.emotional_state, self.emotional_history)
         self.frame.register(self)
         self.frame.show()
+
+        self.b = {"hello", "fiend"}
+        self.output_file = open("picle.p", "wb")
+        pickle.dump({"hi", "you"}, self.output_file)
+        self.output_file.close()
+        #self.k = pickle.load(open("picle.p", "rb"))
+        #print(self.k)
+
+
+        if self.first_launch:
+            self.config.set("default", "firstlaunch", "NO")
+            with open("settings.ini", "w") as f:
+                self.config.write(f)
+
 
     # take user input, generate new data an update ui
     def handle_input(self, user_message):

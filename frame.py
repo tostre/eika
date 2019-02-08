@@ -230,27 +230,4 @@ class DiagramManager:
         # Only in cases where exact positioning matters, add_axes might be useful.
         pass
 
-    # hier wird die plt.Figure benutzt statt die matplotbib-figure. Die wird aber nicht richtig beendet, wenn das Fenster geschlossen wird
-    def __init2(self, init_emotional_state, init_emotional_history):
-        # Data that is needed to make the diagrams (labels, ticks, colors, etc)
-        self.polar_angles = [n / float(5) * 2 * np.pi for n in range(5)]
-        self.polar_angles += self.polar_angles[:1]
-        self.polar_chart_yticks_positions = [0.2, 0.4, 0.6, 0.8]
-        self.polar_chart_yticks_labels = [".2", ".4", ".6", ".8"]
-        self.time_chart_x_values = [0, -1, -2, -3, -4]
-        self.plot_colors = ["orange", "grey", "red", "blue", "green"]
-        self.plot_classes = ["hap", "sad", "ang", "fea", "dis"]
-
-        # 3D-lines that depict the development of the emotional state
-        self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5 = (None, None, None, None, None)
-        self.polar_plot = None
-        self.bar_plot = None
-
-        # init figure and subplots/axes
-        self.fig, (self.ax3, self.ax4) = plt.subplots(nrows=2, ncols=1)
-        #self.fig, ((self.ax1, self.ax2), (self.ax3, self.ax4)) = plt.subplots(nrows=2, ncols=2)
-        # self.make_radar_chart(self.ax1, "Input emotions", 221, self.init_polar_data)
-        # self.make_radar_chart(self.ax2, "Input keywords", 222, self.init_polar_data)
-        self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
-        self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
-        self.fig.tight_layout()
+    # TODO implement function to change name of bot
