@@ -10,7 +10,6 @@ class Bot:
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
         # identity of the bot
-        self.name = name
         self.character = character
         self.classifier = classifier
 
@@ -24,6 +23,8 @@ class Bot:
                 'chatterbot.preprocessors.clean_whitespace'
             ]
         )
+
+        self.train()
 
     def train(self):
         trainer = ChatterBotCorpusTrainer(self.bot)
@@ -47,6 +48,10 @@ class Bot:
             "emotional_state": self.emotional_state,
             "emotional_history": self.emotional_history
         }
-
-
         return self.response_package, self.bot_state_package
+
+    def get_emotional_state(self):
+        return self.character.get_emotional_state()
+
+    def get_emotional_history(self):
+        return self.character.get_emotional_history()

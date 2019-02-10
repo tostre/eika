@@ -103,10 +103,6 @@ class Character:
             "dislike": 0.3
         }
 
-        print("set to default")
-        print(self.emotional_state)
-
-
     def update_emotional_state(self, input_emotions):
         self.input_emotions = np.array(input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods

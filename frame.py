@@ -7,58 +7,92 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as FigureCanvas
 matplotlib.use('TkAgg')
 
 class Frame:
-    def __init__(self, cb_name, bot, character, init_emotional_state, init_emotional_history):
+    def __init__(self, chatbot_name, bot, character, init_emotional_state, init_emotional_history):
         # initialise variables
-        self.cb_name = cb_name
+        self.chatbot_name = chatbot_name
         self.bot = bot
         self.character = character
         self.user_input = None
-        self.response = None
+        # saves what diagrams are displayable, which are active and what type they are
+        self.visible_diagrams = {
+            "emotional_state": [True, "bar"],
+            "emotional_history": [True, "time"],
+            "input_emotions": [False, "bar"],
+            "input_topics": [False, "bar"]
+        }
+
+        self.dgm = DiagramManager(self.visible_diagrams, init_emotional_state, init_emotional_history)
+        # initialize all ui elements
         self.root = tk.Tk()
-        self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
-
-        # create menubar
         self.menubar = tk.Menu(self.root)
-        self.filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.filemenu.add_command(label="Edit bot personality")
-        self.filemenu.add_command(label="Edit bot mood")
-        self.filemenu.add_command(label="Edit bot emotions")
-        self.filemenu.add_separator()
-        self.filemenu.add_command(label="Retrain chatbot", command=self.bot.train)
-        self.filemenu.add_command(label="Reset chatbot", command=self.reset_bot)
-        self.filemenu.add_command(label="Update canvas", command=self.update_diagrams)
-        self.menubar.add_cascade(label="Configure", menu=self.filemenu)
-
-        # create root-window
-        self.root.configure(menu=self.menubar)
-        self.root.title(cb_name)
-        self.root.resizable(0, 0)
-
-        # create widgets
-        self.chatout = tk.Text(self.root, width=40, state="disabled")
-        self.chatin = tk.Entry(self.root)
-        self.chatin.bind('<Return>', self.notify_controller)
-        self.chatin.focus_set()
+        self.menu = tk.Menu(self.menubar, tearoff=0)
+        self.chat_out = tk.Text(self.root, width=40, state="disabled")
+        self.chat_in = tk.Entry(self.root)
         self.log = tk.Text(self.root, width=40, state="disabled")
         self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
-        self.button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
-
-        # create diagram space
+        self.send_button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
         self.diagram_frame = tk.Frame(self.root)
         self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)
+        self.chat_in.bind('<Return>', self.notify_controller)
+        self.chat_in.focus_set()
 
-        # position ui elements
-        self.chatout.grid(row=1, column=1, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
-        self.log.grid(row=1, column=3, sticky=tk.E + tk.W + tk.N + tk.S)
-        self.chatin.grid(row=2, column=1, sticky=tk.W + tk.E)
-        self.button.grid(row=2, column=2, sticky=tk.E + tk.W)
-        self.diagram_frame.grid(row=1, column=4, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
-        self.info_label.grid(row=2, column=4, sticky=tk.E)
-        self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        # create frame and menu
+        self.create_frame(self.chatbot_name)
+        self.pack_widgets()
 
         # set subscriber list (implements observer pattern)
         self.controller = None
         self.subscribers = set()
+
+    # creates main frame and menu bar
+    def create_frame(self, title):
+        # create menubar entries
+        self.menu.add_command(label="Update canvas", command=self.update_diagrams)
+        self.menu.add_separator()
+        self.menu.add_command(label="Retrain chatbot", command=self.bot.train)
+        self.menu.add_command(label="Reset chatbot", command=self.reset_bot)
+        self.menu.add_command(label="Change name", command=self.show_name_window)
+        self.menubar.add_cascade(label="Configure", menu=self.menu)
+        # create root-window
+        self.root.configure(menu=self.menubar)
+        self.root.title(title)
+        self.root.resizable(0, 0)
+
+    # places widgets in the frame
+    def pack_widgets(self):
+        # position ui elements
+        self.chat_out.grid(row=1, column=1, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.log.grid(row=1, column=3, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.chat_in.grid(row=2, column=1, sticky=tk.W + tk.E)
+        self.send_button.grid(row=2, column=2, sticky=tk.E + tk.W)
+        self.diagram_frame.grid(row=1, column=4, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
+        self.info_label.grid(row=2, column=4, sticky=tk.E)
+        self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
+    # TODO diese methoden so ausbauen, dass man damit alle werte des charackters ändern kann
+    def show_name_window(self):
+        self.change_name_frame = tk.Tk()
+
+        self.name_label = tk.Label(self.change_name_frame, text="Enter name below and confim with enter")
+        self.namein = tk.Entry(self.change_name_frame)
+        self.namein.bind('<Return>', self.change_name)
+
+        self.name_label.pack()
+        self.namein.pack()
+
+        self.change_name_frame.mainloop()
+
+    def change_name(self, event):
+        self.new_name = self.namein.get()
+        print(self.new_name)
+        self.change_name_frame.destroy()
+
+    # TODO Methode, mit der man auswählen kann welche Diagramme man sehen will
+    # Beispieldiagramme:
+    # emotional_state des bots
+    # emotional_history des bots
+    # input message emotions
+    # input topics
 
     # the following two function implement the observer pattern
     def register(self, who):
@@ -71,30 +105,26 @@ class Frame:
     def notify_controller_proxy(self):
         self.notify_controller(None)
 
+    # notifies objects that are observing this class
     def notify_controller(self, event):
-        self.user_input = self.chatin.get()
+        self.user_input = self.chat_in.get()
         if self.user_input:
             self.controller.handle_input(self.user_input)
 
-    def reset_bot(self):
-        self.character.set_to_defaults()
-        self.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
-
     # prints in chatout widget
-    def update_chatout(self, input, response):
+    def update_chat_out(self, input, response):
         # prints input, empties input field
-        self.chatout.configure(state="normal")
-        self.chatout.insert(tk.END, "Du: " + input + "\n")
+        self.chat_out.configure(state="normal")
+        self.chat_out.insert(tk.END, "Du: " + input + "\n")
         # deletes text from index 0 till the end in input filed
-        self.chatin.delete(0, tk.END)
+        self.chat_in.delete(0, tk.END)
         # inserts chatbot answer in chat
-        self.chatout.insert(tk.END, self.cb_name + ": " + response + "\n")
-        self.chatout.see(tk.END)
-        self.chatout.configure(state="disabled")
+        self.chat_out.insert(tk.END, self.chatbot_name + ": " + response + "\n")
+        self.chat_out.see(tk.END)
+        self.chat_out.configure(state="disabled")
 
     # prints to the log widget, used to display additional text data (sentiment etc)
     def update_log(self, output):
-        print("log")
         # unlock widget, insert, lock widget
         self.log.configure(state="normal")
         self.log.delete(1.0, tk.END)
@@ -102,16 +132,22 @@ class Frame:
             self.log.insert(tk.END, item + "\n")
         self.log.configure(state="disabled")
 
+    # updates diagrams with new values
     def update_diagrams(self, emotional_state, history_data):
         self.dgm.update_time_chart(history_data, self.diagram_canvas)
         self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, self.diagram_canvas)
 
+    # resets bit to default values and updates the diagrams
+    def reset_bot(self):
+        self.character.set_to_defaults()
+        self.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
+
     def show(self):
         self.root.mainloop()
 
-
+# TODO hier die methode so modifizieren, dass die diagramme nach dem dict "visible_diagrams" aufgebaut werden
 class DiagramManager:
-    def __init__(self, init_emotional_state, init_emotional_history):
+    def __init__(self, diagrams, init_emotional_state, init_emotional_history):
         # Data that is needed to make the diagrams (labels, ticks, colors, etc)
         self.polar_angles = [n / float(5) * 2 * np.pi for n in range(5)]
         self.polar_angles += self.polar_angles[:1]
@@ -133,6 +169,9 @@ class DiagramManager:
         self.ax4 = self.fig.add_subplot(212)
         # self.make_radar_chart(self.ax1, "Input emotions", 221, self.init_polar_data)
         # self.make_radar_chart(self.ax2, "Input keywords", 222, self.init_polar_data)
+
+        # TODO hier damit ansetzen (siehe letztes todo)
+        # create diagrams according to the visible diagrams
         self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
         self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
         self.fig.set_tight_layout(True)
@@ -237,4 +276,3 @@ class DiagramManager:
         # Only in cases where exact positioning matters, add_axes might be useful.
         pass
 
-    # TODO implement function to change name of bot
