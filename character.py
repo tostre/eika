@@ -11,31 +11,51 @@ import math
 
 class Character:
     def __init__(self, emotions, first_launch):
-        # for an explanation of all the variables, see self.reset_to_defaults
-
+        # in the case of the first launch, load default values, else load previous state
         print(first_launch)
         if first_launch:
-            self.reset_to_defaults()
+            self.set_to_defaults()
         else:
-            print("load")
-            self.character_npz = np.load("character.npz")
-            self.trait_values = self.character_npz.get("trait_values")
-            self.max_values = self.character_npz.get("max_values")
-            self.emotional_state = self.character_npz.get("emotional_state")
-            self.emotional_history = self.character_npz.get("emotional_history")
-            self.empathy_functions = self.character_npz.get("empathy_functions")
-            self.decay_modifiers_values = self.character_npz.get("decay_modifiers_values")
-            self.state_modifiers_values = self.character_npz.get("state_modifiers_values")
-            self.state_modifiers_threshold = self.character_npz.get("state_modifiers_threshold")
-            self.delta_function = self.character_npz.get("delta_function")
-            self.relationship_status = self.character_npz.get("relationship_status")
-            self.relationship_modifiers = self.character_npz.get("relationship_modifiers")
+            self.load()
 
         self.emotions = emotions
 
 
-    def reset_to_defaults(self):
-        print("reset")
+
+
+    # saves the current character in a npz file
+    def save(self):
+        np.savez("character",
+                 trait_values=self.trait_values,
+                 max_values=self.max_values,
+                 emotional_state=self.emotional_state,
+                 emotional_history=self.emotional_history,
+                 empathy_functions=self.empathy_functions,
+                 decay_modifiers_values=self.decay_modifiers_values,
+                 state_modifiers_values=self.state_modifiers_values,
+                 state_modifiers_threshold=self.state_modifiers_threshold,
+                 delta_function=self.delta_function,
+                 relationship_status=self.relationship_status,
+                 relationship_modifiers=self.relationship_modifiers)
+
+    # loads character variables from a npz file
+    def load(self):
+        self.character_npz = np.load("character.npz")
+        self.trait_values = self.character_npz.get("trait_values")
+        self.max_values = self.character_npz.get("max_values")
+        self.emotional_state = self.character_npz.get("emotional_state")
+        self.emotional_history = self.character_npz.get("emotional_history")
+        self.empathy_functions = self.character_npz.get("empathy_functions")
+        self.decay_modifiers_values = self.character_npz.get("decay_modifiers_values")
+        self.state_modifiers_values = self.character_npz.get("state_modifiers_values")
+        self.state_modifiers_threshold = self.character_npz.get("state_modifiers_threshold")
+        self.delta_function = self.character_npz.get("delta_function")
+        self.relationship_status = self.character_npz.get("relationship_status")
+        self.relationship_modifiers = self.character_npz.get("relationship_modifiers")
+        print("load")
+        print(self.emotional_state)
+
+    def set_to_defaults(self):
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
         self.max_values = [0.900, 0.900, 0.900, 0.900, 0.900]
         self.emotional_state = self.trait_values.copy()
@@ -90,21 +110,8 @@ class Character:
             "dislike": 0.3
         }
 
-        np.savez("character",
-                 trait_values=self.trait_values,
-                 max_values=self.max_values,
-                 emotional_state=self.emotional_state,
-                 emotional_history=self.emotional_history,
-                 empathy_functions=self.empathy_functions,
-                 decay_modifiers_values=self.decay_modifiers_values,
-                 state_modifiers_values=self.state_modifiers_values,
-                 state_modifiers_threshold=self.state_modifiers_threshold,
-                 delta_function=self.delta_function,
-                 relationship_status=self.relationship_status,
-                 relationship_modifiers=self.relationship_modifiers)
-
-    def save_state(self):
-        pass
+        print("default")
+        print(self.emotional_state)
 
 
     def update_emotional_state(self, input_emotions):

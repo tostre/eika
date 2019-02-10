@@ -24,6 +24,7 @@ class Frame:
         self.filemenu.add_command(label="Edit bot emotions")
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Retrain chatbot", command=self.bot.train)
+        self.filemenu.add_command(label="Reset chatbot", command=self.bot.train)
         self.filemenu.add_command(label="Update canvas", command=self.update_diagrams)
         self.menubar.add_cascade(label="Configure", menu=self.filemenu)
 

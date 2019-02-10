@@ -13,7 +13,7 @@ class Controller:
     def __init__(self):
         # read config file and save values in variables
         self.config = configparser.ConfigParser()
-        self.config.read("settings.ini")
+        self.config.read("config.ini")
         self.name = self.config.get("default", "botname")
         self.first_launch = self.config.getboolean("default", "firstlaunch")
 
@@ -52,11 +52,24 @@ class Controller:
         #self.k = pickle.load(open("picle.p", "rb"))
         #print(self.k)
 
+        print("frame closed")
+        self.save_data()
 
         if self.first_launch:
             self.config.set("default", "firstlaunch", "NO")
-            with open("settings.ini", "w") as f:
+            with open("config.ini", "w") as f:
                 self.config.write(f)
+
+    # handles saving data when closing the program
+    def save_data(self):
+        # saves current character state
+        self.character.save()
+        
+        # set the first launch variable to false
+        self.config.set("default", "firstlaunch", "NO")
+        # save new value in file
+        with open("config.ini", "w") as f:
+            self.config.write(f)
 
 
     # take user input, generate new data an update ui
