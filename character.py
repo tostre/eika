@@ -11,17 +11,12 @@ import math
 
 class Character:
     def __init__(self, emotions, first_launch):
+        self.emotions = emotions
         # in the case of the first launch, load default values, else load previous state
-        print(first_launch)
         if first_launch:
             self.set_to_defaults()
         else:
             self.load()
-
-        self.emotions = emotions
-
-
-
 
     # saves the current character in a npz file
     def save(self):
@@ -52,8 +47,6 @@ class Character:
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status")
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers")
-        print("load")
-        print(self.emotional_state)
 
     def set_to_defaults(self):
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
@@ -110,7 +103,7 @@ class Character:
             "dislike": 0.3
         }
 
-        print("default")
+        print("set to default")
         print(self.emotional_state)
 
 

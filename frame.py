@@ -7,10 +7,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as FigureCanvas
 matplotlib.use('TkAgg')
 
 class Frame:
-    def __init__(self, cb_name, bot, init_emotional_state, init_emotional_history):
+    def __init__(self, cb_name, bot, character, init_emotional_state, init_emotional_history):
         # initialise variables
         self.cb_name = cb_name
         self.bot = bot
+        self.character = character
         self.user_input = None
         self.response = None
         self.root = tk.Tk()
@@ -24,7 +25,7 @@ class Frame:
         self.filemenu.add_command(label="Edit bot emotions")
         self.filemenu.add_separator()
         self.filemenu.add_command(label="Retrain chatbot", command=self.bot.train)
-        self.filemenu.add_command(label="Reset chatbot", command=self.bot.train)
+        self.filemenu.add_command(label="Reset chatbot", command=self.reset_bot)
         self.filemenu.add_command(label="Update canvas", command=self.update_diagrams)
         self.menubar.add_cascade(label="Configure", menu=self.filemenu)
 
@@ -34,11 +35,11 @@ class Frame:
         self.root.resizable(0, 0)
 
         # create widgets
-        self.chatout = tk.Text(self.root, width=60, state="disabled")
+        self.chatout = tk.Text(self.root, width=40, state="disabled")
         self.chatin = tk.Entry(self.root)
         self.chatin.bind('<Return>', self.notify_controller)
         self.chatin.focus_set()
-        self.log = tk.Text(self.root, width=30, state="disabled")
+        self.log = tk.Text(self.root, width=40, state="disabled")
         self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
         self.button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
 
@@ -75,6 +76,10 @@ class Frame:
         if self.user_input:
             self.controller.handle_input(self.user_input)
 
+    def reset_bot(self):
+        self.character.set_to_defaults()
+        self.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
+
     # prints in chatout widget
     def update_chatout(self, input, response):
         # prints input, empties input field
@@ -89,6 +94,7 @@ class Frame:
 
     # prints to the log widget, used to display additional text data (sentiment etc)
     def update_log(self, output):
+        print("log")
         # unlock widget, insert, lock widget
         self.log.configure(state="normal")
         self.log.delete(1.0, tk.END)

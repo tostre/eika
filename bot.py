@@ -15,6 +15,8 @@ class Bot:
         self.classifier = classifier
 
         self.response = None
+        self.response_package = {}
+        self.bot_state_package = {}
 
         self.bot = cb.ChatBot(
             name,
@@ -31,7 +33,6 @@ class Bot:
     # returns chatbot response, with some additional data
     def respond(self, user_message):
         self.response = self.bot.get_response(user_message)
-
 
         self.response_package = {
             "response": self.response,
