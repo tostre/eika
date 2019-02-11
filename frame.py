@@ -135,7 +135,7 @@ class Frame:
     # updates diagrams with new values
     def update_diagrams(self, emotional_state, history_data):
         self.dgm.update_time_chart(history_data, self.diagram_canvas)
-        self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, self.diagram_canvas)
+        self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, history_data, self.diagram_canvas)
 
     # resets bit to default values and updates the diagrams
     def reset_bot(self):
@@ -156,6 +156,7 @@ class DiagramManager:
         self.time_chart_x_values = [0, -1, -2, -3, -4]
         self.labels = []
         self.plot_colors = ["orange", "grey", "red", "blue", "green"]
+        self.plot_colors_previous_step = ["black", "black", "black", "black", "black"]
         self.plot_classes = ["hap", "sad", "ang", "fea", "dis"]
 
         # 2D-lines that depict the development of the emotional state
@@ -172,7 +173,7 @@ class DiagramManager:
 
         # TODO hier damit ansetzen (siehe letztes todo)
         # create diagrams according to the visible diagrams
-        self.make_bar_chart(self.ax3, init_emotional_state, "bot emotional state")
+        self.make_bar_chart(self.ax3, init_emotional_state, init_emotional_history, "bot emotional state")
         self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
         self.fig.set_tight_layout(True)
 
@@ -180,7 +181,7 @@ class DiagramManager:
         return self.fig
 
     # create and update a bar chart
-    def make_bar_chart(self, ax, init_bar_data, title):
+    def make_bar_chart(self, ax, init_bar_data, history_data, title):
         ax.set_title(title)
         ax.set_ylim(0, 1)
         ax.yaxis.tick_right()
@@ -191,10 +192,11 @@ class DiagramManager:
             self.labels.append(self.plot_classes[index] + " (" + init_bar_data[index].__str__() + ")")
 
         ax.bar(self.labels, init_bar_data, width=.9, color=self.plot_colors, alpha=.75)
+        ax.bar(self.labels, history_data[1], width=.01, color=self.plot_colors_previous_step, alpha=1)
 
-    def update_bar_chart(self, ax, emotional_state, canvas):
+    def update_bar_chart(self, ax, emotional_state, history_data, canvas):
         ax.clear()
-        self.make_bar_chart(ax, emotional_state, "bot emotional state")
+        self.make_bar_chart(ax, emotional_state, history_data, "bot emotional state")
         canvas.draw()
 
     # create and update a line chart

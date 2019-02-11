@@ -41,17 +41,6 @@ class Controller:
         # save all session data after the frame is closed
         self.save()
 
-    # handles saving data when closing the program
-    def save(self):
-        # saves current character state
-        self.character.save()
-        
-        # set the first launch variable to false
-        self.config.set("default", "firstlaunch", "NO")
-        # save new value in file
-        with open("config.ini", "w") as f:
-            self.config.write(f)
-
     # take user input, generate new data an update ui
     def handle_input(self, user_message):
         # get new values based in response
@@ -74,6 +63,17 @@ class Controller:
         self.frame.update_chat_out(user_message, self.response_package.get("response").__str__())
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
+
+    # handles saving data when closing the program
+    def save(self):
+        # saves current character state
+        self.character.save()
+
+        # set the first launch variable to false
+        self.config.set("default", "firstlaunch", "NO")
+        # save new value in file
+        with open("config.ini", "w") as f:
+            self.config.write(f)
 
 
 controller = Controller()
