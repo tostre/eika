@@ -3,8 +3,8 @@ from bot import Bot
 from character import Character
 from classifier import Classifier
 import configparser
+import pickle
 
-# TODO emotional history scheint sich nicht richtig zu updaten
 # TODO alles außer fear und anger scheint sich nicht zu ändern
 
 # controller
@@ -16,6 +16,7 @@ class Controller:
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         self.botname = self.config.get("default", "botname")
+        self.active_diagrams = self.load_setting("preferences_ui")
 
         # initialize chat variables
         self.response_package = None
@@ -66,6 +67,10 @@ class Controller:
 
     # handles saving data when closing the program
     def save(self):
+        # saves the ui state (visible diagrams)
+        with open("ui_state", "wb") as f:
+            pickle.dump(self.active_diagrams, f)
+
         # saves current character state
         self.character.save()
 
@@ -75,5 +80,18 @@ class Controller:
         with open("config.ini", "w") as f:
             self.config.write(f)
 
+    # loads an object from a file
+    def load_setting(self, filename):
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+
 
 controller = Controller()
+
+
+
+
+
+#for key, item in active_diagrams.items():
+#    print(key)
+#    print(item)

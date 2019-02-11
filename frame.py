@@ -195,6 +195,7 @@ class DiagramManager:
         ax.bar(self.labels, history_data[1], width=.01, color=self.plot_colors_previous_step, alpha=1)
 
     def update_bar_chart(self, ax, emotional_state, history_data, canvas):
+
         ax.clear()
         self.make_bar_chart(ax, emotional_state, history_data, "bot emotional state")
         canvas.draw()
@@ -203,8 +204,9 @@ class DiagramManager:
     def make_time_chart(self, ax, init_time_data, title):
         ax.set_title(title)
         ax.yaxis.tick_right()
-        ax.set_ylim(0, 1)
         ax.set_xlim(-4, 0)
+        ax.set_xticks(np.arange(-4, 0, 1))
+        ax.set_ylim(0, 1)
         ax.grid(axis="y", linestyle=':', linewidth=.5)
         # Graphen plotten
         self.time_plot1, = ax.plot(self.time_chart_x_values, [init_time_data[i][0] for i in range(0, 5)], linewidth=.5, color=self.plot_colors[0])
@@ -216,6 +218,7 @@ class DiagramManager:
         ax.legend((self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5), self.plot_classes, loc=2)
 
     def update_time_chart(self, time_data, diagram_canvas):
+        print(time_data)
         self.time_plot1.set_ydata([time_data[i][0] for i in range(0, 5)])
         self.time_plot2.set_ydata([time_data[i][1] for i in range(0, 5)])
         self.time_plot3.set_ydata([time_data[i][2] for i in range(0, 5)])

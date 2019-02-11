@@ -173,7 +173,7 @@ class Character:
         # update emotional history
         # inserts emotional state at position 0 on axis 0 into emotional_history
         self.emotional_history = np.insert(self.emotional_history, 0, self.emotional_state, 0)
-        self.emotional_history = np.delete(self.emotional_history, 4, 0)
+        self.emotional_history = np.delete(self.emotional_history, 5, 0)
 
         return self.emotional_state, self.emotional_history
 
