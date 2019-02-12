@@ -6,17 +6,41 @@
 # Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
 # werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 import numpy as np
-import math
+import timeit
 
 
 class Character:
     def __init__(self, emotions, first_launch):
         self.emotions = emotions
+        self.character_package = {}
         # in the case of the first launch, load default values, else load previous state
         if first_launch:
             self.set_to_defaults()
         else:
             self.load()
+
+    def save_character(self):
+        pass
+
+    def save_bot_state(self):
+        pass
+
+    def get_character_package(self):
+
+        self.character_package = {
+            "trait_values": self.trait_values,
+            "max_values": self.max_values,
+            "empathy_functions": self.empathy_functions,
+            "decay_modifiers_values": self.decay_modifiers_values,
+            "state_modifiers_values": self.state_modifiers_values,
+            "state_modifiers_threshold": self.state_modifiers_threshold,
+            "delta_function": self.delta_function,
+            "relationship_status": self.relationship_status,
+            "relationship_modifiers": self.relationship_modifiers
+        }
+
+        return self.character_package
+
 
     # saves the current character in a npz file
     def save(self):
@@ -45,8 +69,8 @@ class Character:
         self.state_modifiers_values = self.character_npz.get("state_modifiers_values")
         self.state_modifiers_threshold = self.character_npz.get("state_modifiers_threshold")
         self.delta_function = self.character_npz.get("delta_function")
-        self.relationship_status = self.character_npz.get("relationship_status")
-        self.relationship_modifiers = self.character_npz.get("relationship_modifiers")
+        self.relationship_status = self.character_npz.get("relationship_status").item()
+        self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
 
     def set_to_defaults(self):
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
@@ -73,7 +97,7 @@ class Character:
 
         # decay mod related variables
         # values predicting how much an emotional values lowers per round
-        self.decay_modifiers_values = np.array([-0.05, -0.05, -0.05, -0.05, -0.05])
+        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.01, -0.01, -0.01])
 
         # state modifier related variables
         # Array zeigt, welche Emotionen (Zeilen) von welchen anderen Emotionene (Spalten) mit einem hohen Wert gedämpft/verstärkt werden
@@ -105,17 +129,20 @@ class Character:
 
     def update_emotional_state(self, input_emotions):
         self.input_emotions = np.array(input_emotions)
+        self.debug("input_emotions", self.input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
         self.modifiers = np.zeros((5, 3))
         # Saves the change for one emotion caused by all input emotions
         self.current_emotion_empathy_modifiers = np.zeros(5)
-
         # apply relationship modifier
         # the better the relationship the more empathic you are and take the input seriously
         # check if the inserted relationship status is in the list of relationship modifiers
         if self.relationship_status in self.relationship_modifiers:
             # multiply the inputs with the relationship modifier
             self.input_emotions *= self.relationship_modifiers[self.relationship_status]
+            print("true")
+            self.debug("relationship_modifier", self.relationship_modifiers[self.relationship_status])
+            self.debug("input_emotions", self.input_emotions)
 
         # reapeat for every emotion the bot has (happiness, sadness, etc.)
         for index, emotion in enumerate(self.emotions, start=0):
@@ -150,6 +177,9 @@ class Character:
         self.emotional_state_old = self.emotional_state.copy()
         # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
+        self.debug("emo state old", self.emotional_state_old)
+        self.debug("modifiers", self.modifiers)
+        self.debug("emo state", self.emotional_state)
 
         # apply delta modifier
         # delete the first element because we only need the deltas of the nagitive emotions
@@ -190,6 +220,9 @@ class Character:
             return function[3]
         else:
             return self.function_result
+
+    def debug(self, name, var):
+        print(name, ": \n", var)
 
     def get_emotional_state(self):
         return self.emotional_state

@@ -33,7 +33,7 @@ class Frame:
         self.send_button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
         self.diagram_frame = tk.Frame(self.root)
         self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)
-        self.chat_in.bind('<Return>', self.notify_controller)
+        self.chat_in.bind('<Return>', self.notify_subscribers)
         self.chat_in.focus_set()
 
         # create frame and menu
@@ -103,10 +103,10 @@ class Frame:
 
     # Delays a command to the notify_controller from objects that cant pass an event (like the button)
     def notify_controller_proxy(self):
-        self.notify_controller(None)
+        self.notify_subscribers(None)
 
     # notifies objects that are observing this class
-    def notify_controller(self, event):
+    def notify_subscribers(self, event):
         self.user_input = self.chat_in.get()
         if self.user_input:
             self.controller.handle_input(self.user_input)
@@ -218,7 +218,6 @@ class DiagramManager:
         ax.legend((self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5), self.plot_classes, loc=2)
 
     def update_time_chart(self, time_data, diagram_canvas):
-        print(time_data)
         self.time_plot1.set_ydata([time_data[i][0] for i in range(0, 5)])
         self.time_plot2.set_ydata([time_data[i][1] for i in range(0, 5)])
         self.time_plot3.set_ydata([time_data[i][2] for i in range(0, 5)])
