@@ -9,8 +9,27 @@ import numpy as np
 import timeit
 
 
+
+
+# default characters:
+# stable character
+# reactive/empathatic character
+# jähzornig
+
 class Character:
     def __init__(self, emotions, first_launch):
+        self.trait_values = []
+        self.max_values = []
+        self.emotional_state = []
+        self.emotional_history = np.zeros((5, 5))
+#        self.empathy_functions = np.array()
+#        self.decay_modifiers_values = np.array()
+        self.state_modifiers_values = []
+        self.state_modifiers_threshold = None
+        self.delta_function = []
+        self.relationship_status = None
+        self.relationship_modifiers = {}
+
         self.emotions = emotions
         self.character_package = {}
         # in the case of the first launch, load default values, else load previous state
@@ -19,14 +38,7 @@ class Character:
         else:
             self.load()
 
-    def save_character(self):
-        pass
-
-    def save_bot_state(self):
-        pass
-
     def get_character_package(self):
-
         self.character_package = {
             "trait_values": self.trait_values,
             "max_values": self.max_values,
@@ -128,27 +140,28 @@ class Character:
         }
 
     def update_emotional_state(self, input_emotions):
+        print(type(input_emotions[0]))
         self.input_emotions = np.array(input_emotions)
         self.debug("input_emotions", self.input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
         self.modifiers = np.zeros((5, 3))
         # Saves the change for one emotion caused by all input emotions
         self.current_emotion_empathy_modifiers = np.zeros(5)
+
         # apply relationship modifier
         # the better the relationship the more empathic you are and take the input seriously
         # check if the inserted relationship status is in the list of relationship modifiers
         if self.relationship_status in self.relationship_modifiers:
             # multiply the inputs with the relationship modifier
             self.input_emotions *= self.relationship_modifiers[self.relationship_status]
-            print("true")
-            self.debug("relationship_modifier", self.relationship_modifiers[self.relationship_status])
-            self.debug("input_emotions", self.input_emotions)
+            #self.debug("relationship_modifier", self.relationship_modifiers[self.relationship_status])
+            #self.debug("input_emotions", self.input_emotions)
 
         # reapeat for every emotion the bot has (happiness, sadness, etc.)
         for index, emotion in enumerate(self.emotions, start=0):
             # Apply decay_modifier
             # Every emotion automatically reduces by 0.05 per round
-            self.modifiers[index][1] = self.decay_modifiers_values[index]
+            self.modifiers[index][0] = self.decay_modifiers_values[index]
 
             # apply empathy modifier
             # repeat for every emotion again, cause every emotion can have an infuence on all other emotions
@@ -156,7 +169,7 @@ class Character:
                 # save all the influences on the currently checked emotion (outer loop) in an array
                 self.current_emotion_empathy_modifiers[i] = self.linear_function(self.input_emotions[i], function)
             # sava the sum of all the single empathy mods in the modifier-array
-            self.modifiers[index][0] = sum(self.current_emotion_empathy_modifiers)
+            self.modifiers[index][1] = sum(self.current_emotion_empathy_modifiers)
 
             # apply state modifier
             # get the state_modifiers for this emotion (outer loop)
@@ -167,7 +180,7 @@ class Character:
                 if self.emotional_state[i] <= self.state_modifiers_threshold:
                     self.current_state_modifiers[i] = 1
             # berechne den duchschnitt der state modifier
-            self.state_modifier_mean = np.mean(self.current_state_modifiers[index])
+            self.state_modifier_mean = np.mean(self.current_state_modifiers)
             # Multipiliere alle modifier (input, decay, etc.) mit dem durchschnitt des state modifiers für diese emotion
             # Die emotionen die nicht über dem threshold sind, haben hier keinen einfluss, weil sie auf 1 gesetzt wurden
             # d.h. bei der berechnung des durchschnitts wurden sie quasi schon rausgerechnet
@@ -177,9 +190,11 @@ class Character:
         self.emotional_state_old = self.emotional_state.copy()
         # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
-        self.debug("emo state old", self.emotional_state_old)
         self.debug("modifiers", self.modifiers)
-        self.debug("emo state", self.emotional_state)
+        self.debug("modifiers sum", np.sum(self.modifiers, 1))
+        #self.debug("emo state old", self.emotional_state_old)
+        #self.debug("modifiers", self.modifiers)
+        #self.debug("emo state", self.emotional_state)
 
         # apply delta modifier
         # delete the first element because we only need the deltas of the nagitive emotions
@@ -187,8 +202,10 @@ class Character:
         # calc the mean of the deltas
         self.mean_delta = np.mean(self.deltas)
         # check if the mean is below zero, ie the negative emotions shrunk
+        # TODO bei der Delta-Funktion kommen glaube ich immer positive Zahlen raus, ist das richtig so?
         if self.mean_delta < 0:
             # add the value of the delta function to the happiness value
+            self.debug("delta", self.linear_function(self.mean_delta, self.delta_function))
             self.emotional_state[0] += self.linear_function(self.mean_delta, self.delta_function)
 
         # check if all emotions are in range of trait and max values
@@ -220,6 +237,9 @@ class Character:
             return function[3]
         else:
             return self.function_result
+
+    def linear_function_two(self, x, function):
+        pass
 
     def debug(self, name, var):
         print(name, ": \n", var)

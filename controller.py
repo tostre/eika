@@ -2,6 +2,7 @@ from frame import Frame
 from bot import Bot
 from character import Character
 from classifier import Classifier
+from character_manager import Character_Manager
 import configparser
 import pickle
 from timeit import Timer
@@ -14,33 +15,12 @@ from timeit import Timer
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
-        self.work = None
+        self.c_manager = Character_Manager("character_irascible")
 
+        self.work = None
+        # read config file and save values in variables
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
-
-        if(self.config.getboolean("default", "firstlaunch")):
-            pass
-        else:
-            # load old state and history
-            # load character
-            #self.bott = Bot(old_state, old_history, character)
-            #self.frrame = Frame(old_state, old_history)
-            pass
-
-
-        # 1. load config and see if this is the first launch
-        # if not:
-        #   load state and history
-        #   self.state_package = load(state_package)
-        #   load default character
-        #   load ui state
-
-
-
-
-        # read config file and save values in variables
-
         self.botname = self.config.get("default", "botname")
         self.active_diagrams = self.load_setting("preferences_ui")
 
@@ -68,14 +48,6 @@ class Controller:
         # save all session data after the frame is closed
         self.save_session()
 
-        #self.t = Timer(lambda: self.bot.respond("hi"))
-        #print(self.t.timeit(number=10))
-
-    def frame_timeit_setup(self):
-        self.frame = Frame(self.botname, self.bot, self.character, self.bot.get_emotional_state(), self.bot.get_emotional_history())
-        self.frame.register(self)
-        self.frame.show()
-
     # take user input, generate new data an update ui
     def handle_input(self, user_message):
         # get new values based in response
@@ -96,6 +68,9 @@ class Controller:
 
         # update widgets
         self.frame.update_chat_out(user_message, self.response_package.get("response").__str__())
+        # TODO: Die update-log Methode so umschreiben: Man kann beliebig viele Parameter übergeben (in einem Array oder einfachs so)
+        # Die werden dann in der update_log-Methode mit einem Linebreak aneinander verkettet und gezeichnet
+        # so muss man die nicht alle hier erst zu einem String zusammenfassen
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
 

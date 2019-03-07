@@ -24,8 +24,11 @@ class Frame:
         self.dgm = DiagramManager(self.visible_diagrams, init_emotional_state, init_emotional_history)
         # initialize all ui elements
         self.root = tk.Tk()
-        self.menubar = tk.Menu(self.root)
-        self.menu = tk.Menu(self.menubar, tearoff=0)
+        self.menubar = tk.Menu()
+        self.file_menu = tk.Menu(tearoff=0)
+        self.debug_menu = tk.Menu(tearoff=0)
+        self.load_menu = tk.Menu(tearoff=0)
+        self.response_menu = tk.Menu(tearoff=0)
         self.chat_out = tk.Text(self.root, width=40, state="disabled")
         self.chat_in = tk.Entry(self.root)
         self.log = tk.Text(self.root, width=40, state="disabled")
@@ -46,17 +49,32 @@ class Frame:
 
     # creates main frame and menu bar
     def create_frame(self, title):
-        # create menubar entries
-        self.menu.add_command(label="Update canvas", command=self.update_diagrams)
-        self.menu.add_separator()
-        self.menu.add_command(label="Retrain chatbot", command=self.bot.train)
-        self.menu.add_command(label="Reset chatbot", command=self.reset_bot)
-        self.menu.add_command(label="Change name", command=self.show_name_window)
-        self.menubar.add_cascade(label="Configure", menu=self.menu)
-        # create root-window
+        # add menus to menubar
+        self.menubar.add_cascade(label="File", menu=self.file_menu)
+        self.menubar.add_cascade(label="Debug", menu=self.debug_menu)
+        # create file menu
+        self.file_menu.add_cascade(label="Load character", menu=self.load_menu)
+        self.load_menu.add_command(label="Load stable character")
+        self.load_menu.add_command(label="Load empathetic character")
+        self.load_menu.add_command(label="Load irascible character")
+        # create debug menu
+        self.debug_menu.add_command(label="Retrain chatbot", command=self.bot.train)
+        self.debug_menu.add_command(label="Reset chatbot", command=self.reset_bot)
+        self.debug_menu.add_separator()
+        self.debug_menu.add_cascade(label="Send response", menu=self.response_menu)
+        self.response_menu.add_command(label="Send response: h", command=self.notify_controller_proxy)
+        self.response_menu.add_command(label="Send response: s")
+        self.response_menu.add_command(label="Send response: a")
+        self.response_menu.add_command(label="Send response: f")
+        self.response_menu.add_command(label="Send response: f")
+        # configure frame
         self.root.configure(menu=self.menubar)
         self.root.title(title)
         self.root.resizable(0, 0)
+
+    def test(self, test):
+        #self.controller.test(test)
+        print(test)
 
     # places widgets in the frame
     def pack_widgets(self):
@@ -68,24 +86,6 @@ class Frame:
         self.diagram_frame.grid(row=1, column=4, columnspan=2, sticky=tk.E + tk.W + tk.N + tk.S)
         self.info_label.grid(row=2, column=4, sticky=tk.E)
         self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-
-    # TODO diese methoden so ausbauen, dass man damit alle werte des charackters ändern kann
-    def show_name_window(self):
-        self.change_name_frame = tk.Tk()
-
-        self.name_label = tk.Label(self.change_name_frame, text="Enter name below and confim with enter")
-        self.namein = tk.Entry(self.change_name_frame)
-        self.namein.bind('<Return>', self.change_name)
-
-        self.name_label.pack()
-        self.namein.pack()
-
-        self.change_name_frame.mainloop()
-
-    def change_name(self, event):
-        self.new_name = self.namein.get()
-        print(self.new_name)
-        self.change_name_frame.destroy()
 
     # TODO Methode, mit der man auswählen kann welche Diagramme man sehen will
     # Beispieldiagramme:
@@ -181,7 +181,7 @@ class DiagramManager:
         return self.fig
 
     # create and update a bar chart
-    def make_bar_chart(self, ax, init_bar_data, history_data, title):
+    def make_bar_chart(self, ax, bar_data, history_data, title):
         ax.set_title(title)
         ax.set_ylim(0, 1)
         ax.yaxis.tick_right()
@@ -189,9 +189,9 @@ class DiagramManager:
 
         self.labels.clear()
         for index in range(len(self.plot_classes)):
-            self.labels.append(self.plot_classes[index] + " (" + init_bar_data[index].__str__() + ")")
+            self.labels.append(self.plot_classes[index] + " (" + bar_data[index].__str__() + ")")
 
-        ax.bar(self.labels, init_bar_data, width=.9, color=self.plot_colors, alpha=.75)
+        ax.bar(self.labels, bar_data, width=.9, color=self.plot_colors, alpha=.75)
         ax.bar(self.labels, history_data[1], width=.01, color=self.plot_colors_previous_step, alpha=1)
 
     def update_bar_chart(self, ax, emotional_state, history_data, canvas):
