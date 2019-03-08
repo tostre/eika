@@ -33,7 +33,7 @@ class Bot:
 
     # returns chatbot response, with some additional data
     def respond(self, user_message):
-        if user_message == "h" or user_message == "s" or user_message == "a" or user_message == "f" or user_message == "d":
+        if user_message == "h" or user_message == "s" or user_message == "a" or user_message == "f" or user_message == "d" or user_message == "n":
             return self.respond_debug(user_message)
         else:
             self.response = self.bot.get_response(user_message)
@@ -59,7 +59,6 @@ class Bot:
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
-
         elif user_message == "s":
             self.response_package = {
                 "response": "Debug input: s",
@@ -93,6 +92,15 @@ class Bot:
                 "response_confidence": 100,
                 "input_emotions": [0.00, 0.00, 0.00, 0.00, 1.00],
                 "input_topics": [0.00, 0.00, 0.00, 0.00, 1.00],
+            }
+            self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
+            self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
+        elif user_message == "n":
+            self.response_package = {
+                "response": "Debug input: n",
+                "response_confidence": 100,
+                "input_emotions": [0.10, 0.00, 0.00, 0.00, 0.00],
+                "input_topics": [0.00, 0.00, 0.00, 0.00, 0.00],
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}

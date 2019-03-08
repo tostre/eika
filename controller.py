@@ -5,7 +5,9 @@ from classifier import Classifier
 from character_manager import Character_Manager
 import configparser
 import pickle
+import logging
 from timeit import Timer
+
 
 # TODO alles außer fear und anger scheint sich nicht zu ändern
 
@@ -15,14 +17,17 @@ from timeit import Timer
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
-        self.c_manager = Character_Manager("character_irascible")
+        # logging.basicConfig(level=logging.INFO, filename='app.log', format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
+        logging.basicConfig(level=logging.INFO, filename='app.log', format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
+        self.log = logging.getLogger("controller")
+        self.log.info("program started")
 
+        self.c_manager = Character_Manager("character_default")
         self.work = None
         # read config file and save values in variables
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         self.botname = self.config.get("default", "botname")
-        self.active_diagrams = self.load_setting("preferences_ui")
 
         # initialize chat variables
         self.response_package = None
@@ -36,20 +41,42 @@ class Controller:
         self.topic_keywords_neg_sentiment = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
         # create bot, responsible for generating answers and classifier, for analysing the input
-        self.character = Character(self.emotions, self.config.getboolean("default", "firstlaunch"))
+        self.character = Character(self.emotions, "character_saved", self.config.getboolean("default", "firstlaunch"))
+        print(self.character)
         self.classifier = Classifier(self.topic_keywords)
         self.bot = Bot(self.botname, self.character, self.classifier)
 
         # create frame and update widgets with initial values
         self.frame = Frame(self.botname, self.bot, self.character, self.bot.get_emotional_state(), self.bot.get_emotional_history())
-        self.frame.register(self)
+        self.frame.register_subscriber(self)
         self.frame.show()
 
         # save all session data after the frame is closed
         self.save_session()
+        logging.shutdown()
+
+    def configure_logger(self):
+        self.logger = logging.getLogger("controller")
+        self.logger.setLevel(logging.INFO)
+
+    def handle_intent(self, intent, input_message=None, character=None):
+        if intent == "load_character":
+            self.load_character(character)
+            self.frame.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
+        elif intent == "get_response":
+            if input_message and input_message != "":
+                self.handle_input(input_message)
+        elif intent == "retrain_bot":
+            self.bot.train()
+        elif intent == "reset_state":
+            self.character.reset_bot()
+            self.frame.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
+
 
     # take user input, generate new data an update ui
     def handle_input(self, user_message):
+        self.log.info("handle input")
+        logging.info("input")
         # get new values based in response
         self.response_package, self.bot_state_package = self.bot.respond(user_message)
 
@@ -74,17 +101,17 @@ class Controller:
         self.frame.update_log(self.log_message)
         self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
 
+    def update_log(self, messages):
+        self.log_output = []
+        for item in messages:
+            self.log_output.append(item.__str__())
+        return self.log_output
+
+    def load_character(self, file):
+        self.character.load(file)
+
     # handles saving data when closing the program
     def save_session(self):
-        # save bot state
-        with open("bot_state", "wb") as f:
-            pickle.dump(self.bot.get_bot_state_package(), f)
-        # save character
-        with open("character", "wb") as f:
-            pickle.dump(self.bot.get_character_package(), f)
-        # saves the ui state (visible diagrams)
-        with open("ui_state", "wb") as f:
-            pickle.dump(self.active_diagrams, f)
         # saves current character state
         self.character.save()
 
@@ -94,18 +121,11 @@ class Controller:
         with open("config.ini", "w") as f:
             self.config.write(f)
 
-    # loads an object from a file
-    def load_setting(self, filename):
-        with open(filename, "rb") as f:
-            return pickle.load(f)
+        self.log.info("character saved")
 
 
 controller = Controller()
 
-
-
-
-
-#for key, item in active_diagrams.items():
+# for key, item in active_diagrams.items():
 #    print(key)
 #    print(item)

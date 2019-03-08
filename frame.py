@@ -13,15 +13,8 @@ class Frame:
         self.bot = bot
         self.character = character
         self.user_input = None
-        # saves what diagrams are displayable, which are active and what type they are
-        self.visible_diagrams = {
-            "emotional_state": [True, "bar"],
-            "emotional_history": [True, "time"],
-            "input_emotions": [False, "bar"],
-            "input_topics": [False, "bar"]
-        }
 
-        self.dgm = DiagramManager(self.visible_diagrams, init_emotional_state, init_emotional_history)
+        self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
         # initialize all ui elements
         self.root = tk.Tk()
         self.menubar = tk.Menu()
@@ -32,17 +25,14 @@ class Frame:
         self.chat_out = tk.Text(self.root, width=40, state="disabled")
         self.chat_in = tk.Entry(self.root)
         self.log = tk.Text(self.root, width=40, state="disabled")
-        self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, cMarcel Müller, FH Dortmund ")
-        self.send_button = tk.Button(self.root, text="Send", command=self.notify_controller_proxy)
+        self.info_label = tk.Label(self.root, text="EIKA v.0.0.1, Marcel Müller, FH Dortmund ")
+        self.send_button = tk.Button(self.root, text="Send", command=lambda: self.forward_user_intent(intent="get_response", user_input=self.chat_in.get()))
         self.diagram_frame = tk.Frame(self.root)
         self.diagram_canvas = FigureCanvas(self.dgm.get_diagrams(), master=self.diagram_frame)
-        self.chat_in.bind('<Return>', self.notify_subscribers)
-        self.chat_in.focus_set()
-
+        self.chat_in.bind(sequence='<Return>', func=lambda event: self.forward_user_intent(intent="get_response", user_input=self.chat_in.get()))
         # create frame and menu
         self.create_frame(self.chatbot_name)
         self.pack_widgets()
-
         # set subscriber list (implements observer pattern)
         self.controller = None
         self.subscribers = set()
@@ -54,15 +44,16 @@ class Frame:
         self.menubar.add_cascade(label="Debug", menu=self.debug_menu)
         # create file menu
         self.file_menu.add_cascade(label="Load character", menu=self.load_menu)
-        self.load_menu.add_command(label="Load stable character")
-        self.load_menu.add_command(label="Load empathetic character")
-        self.load_menu.add_command(label="Load irascible character")
+        self.load_menu.add_command(label="Load default character", command=lambda: self.forward_user_intent(intent="load_character", character="character_default"))
+        self.load_menu.add_command(label="Load stable character", command=lambda: self.forward_user_intent(intent="load_character", character="character_stable"))
+        self.load_menu.add_command(label="Load empathetic character", command=lambda: self.forward_user_intent(intent="load_character", character="character_empathetic"))
+        self.load_menu.add_command(label="Load irascible character", command=lambda: self.forward_user_intent(intent="load_character", character="character_irascible"))
         # create debug menu
-        self.debug_menu.add_command(label="Retrain chatbot", command=self.bot.train)
-        self.debug_menu.add_command(label="Reset chatbot", command=self.reset_bot)
+        self.debug_menu.add_command(label="Retrain chatbot", command=lambda: self.forward_user_intent(intent="retrain_bot"))
+        self.debug_menu.add_command(label="Reset chatbot", command=lambda: self.forward_user_intent(intent="reset_state"))
         self.debug_menu.add_separator()
         self.debug_menu.add_cascade(label="Send response", menu=self.response_menu)
-        self.response_menu.add_command(label="Send response: h", command=self.notify_controller_proxy)
+        self.response_menu.add_command(label="Send response: h")
         self.response_menu.add_command(label="Send response: s")
         self.response_menu.add_command(label="Send response: a")
         self.response_menu.add_command(label="Send response: f")
@@ -71,10 +62,6 @@ class Frame:
         self.root.configure(menu=self.menubar)
         self.root.title(title)
         self.root.resizable(0, 0)
-
-    def test(self, test):
-        #self.controller.test(test)
-        print(test)
 
     # places widgets in the frame
     def pack_widgets(self):
@@ -87,35 +74,22 @@ class Frame:
         self.info_label.grid(row=2, column=4, sticky=tk.E)
         self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-    # TODO Methode, mit der man auswählen kann welche Diagramme man sehen will
-    # Beispieldiagramme:
-    # emotional_state des bots
-    # emotional_history des bots
-    # input message emotions
-    # input topics
-
-    # the following two function implement the observer pattern
-    def register(self, who):
+    # lets other classes register themselves as observers
+    def register_subscriber(self, who):
         # Set of subscribers, there should only ever be the controller in there
         self.subscribers.add(who)
         # Controller class, only class this one here is allowed to talk to
         self.controller = who
 
-    # Delays a command to the notify_controller from objects that cant pass an event (like the button)
-    def notify_controller_proxy(self):
-        self.notify_subscribers(None)
-
-    # notifies objects that are observing this class
-    def notify_subscribers(self, event):
-        self.user_input = self.chat_in.get()
-        if self.user_input:
-            self.controller.handle_input(self.user_input)
+    # forwards user interaction with the gui to the controller
+    def forward_user_intent(self, intent, user_input=None, character=None):
+        self.controller.handle_intent(intent=intent, input_message=user_input, character=character)
 
     # prints in chatout widget
-    def update_chat_out(self, input, response):
+    def update_chat_out(self, user_input, response):
         # prints input, empties input field
         self.chat_out.configure(state="normal")
-        self.chat_out.insert(tk.END, "Du: " + input + "\n")
+        self.chat_out.insert(tk.END, "Du: " + user_input + "\n")
         # deletes text from index 0 till the end in input filed
         self.chat_in.delete(0, tk.END)
         # inserts chatbot answer in chat
@@ -133,21 +107,17 @@ class Frame:
         self.log.configure(state="disabled")
 
     # updates diagrams with new values
-    def update_diagrams(self, emotional_state, history_data):
-        self.dgm.update_time_chart(history_data, self.diagram_canvas)
-        self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, history_data, self.diagram_canvas)
+    def update_diagrams(self, emotional_state, emotional_history):
+        self.dgm.update_time_chart(emotional_history, self.diagram_canvas)
+        self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, emotional_history, self.diagram_canvas)
 
-    # resets bit to default values and updates the diagrams
-    def reset_bot(self):
-        self.character.set_to_defaults()
-        self.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
-
+    # draws the ui
     def show(self):
         self.root.mainloop()
 
 # TODO hier die methode so modifizieren, dass die diagramme nach dem dict "visible_diagrams" aufgebaut werden
 class DiagramManager:
-    def __init__(self, diagrams, init_emotional_state, init_emotional_history):
+    def __init__(self, init_emotional_state, init_emotional_history):
         # Data that is needed to make the diagrams (labels, ticks, colors, etc)
         self.polar_angles = [n / float(5) * 2 * np.pi for n in range(5)]
         self.polar_angles += self.polar_angles[:1]
