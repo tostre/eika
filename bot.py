@@ -107,20 +107,10 @@ class Bot:
 
         return self.response_package, self.bot_state_package
 
-    def get_packages(self):
-        return self.response_package, self.bot_state_package
-
-    def get_response_package(self):
-        return self.response_package
-
-    def get_bot_state_package(self):
-        return self.bot_state_package
-
     def get_emotional_state(self):
         return self.character.get_emotional_state()
 
     def get_emotional_history(self):
         return self.character.get_emotional_history()
 
-    def get_character_package(self):
-        return self.character.get_character_package()
+

@@ -18,14 +18,11 @@ import timeit
 # jähzornig
 
 class Character:
-    def __init__(self, emotions, file, first_launch):
+    # constructs a character instance
+    def __init__(self, emotions, first_launch):
         self.log = logging.getLogger(__name__)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        self.logger.info("init")
-
-        self.file = file
-
         self.emotions = emotions
         self.character_package = {}
 
@@ -34,38 +31,6 @@ class Character:
             self.load("character_default")
         else:
             self.load("character_saved")
-
-    def get_character_package(self):
-        self.character_package = {
-            "trait_values": self.trait_values,
-            "max_values": self.max_values,
-            "empathy_functions": self.empathy_functions,
-            "decay_modifiers_values": self.decay_modifiers_values,
-            "state_modifiers_values": self.state_modifiers_values,
-            "state_modifiers_threshold": self.state_modifiers_threshold,
-            "delta_function": self.delta_function,
-            "relationship_status": self.relationship_status,
-            "relationship_modifiers": self.relationship_modifiers
-        }
-        self.logger.info("get character package")
-        return self.character_package
-
-
-    # saves the current character in a npz file
-    def save(self):
-        np.savez("character_saved",
-                 trait_values=self.trait_values,
-                 max_values=self.max_values,
-                 emotional_state=self.emotional_state,
-                 emotional_history=self.emotional_history,
-                 empathy_functions=self.empathy_functions,
-                 decay_modifiers_values=self.decay_modifiers_values,
-                 state_modifiers_values=self.state_modifiers_values,
-                 state_modifiers_threshold=self.state_modifiers_threshold,
-                 delta_function=self.delta_function,
-                 relationship_status=self.relationship_status,
-                 relationship_modifiers=self.relationship_modifiers)
-        self.logger.info("save")
 
     # loads character variables from a npz file
     def load(self, file):
@@ -81,16 +46,35 @@ class Character:
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status").item()
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
-        self.log.info(f"{file} restored")
+        self.log.info(f"Session start. {file} restored")
 
+    # saves the current character in a npz file
+    def save(self):
+        np.savez("character_saved",
+                 trait_values=self.trait_values,
+                 max_values=self.max_values,
+                 emotional_state=self.emotional_state,
+                 emotional_history=self.emotional_history,
+                 empathy_functions=self.empathy_functions,
+                 decay_modifiers_values=self.decay_modifiers_values,
+                 state_modifiers_values=self.state_modifiers_values,
+                 state_modifiers_threshold=self.state_modifiers_threshold,
+                 delta_function=self.delta_function,
+                 relationship_status=self.relationship_status,
+                 relationship_modifiers=self.relationship_modifiers)
+        self.logger.info("Session end. character_saved saved.")
+
+    # resets character state (emotional state/history)
     def reset_bot(self):
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
+        self.log.info("Character state reset")
 
-
+    # updates internal emotional state/history based on input emotions
     def update_emotional_state(self, input_emotions):
-        self.logger.info(f"input_emotions: {input_emotions}")
+        self.logger.info(f"old emotional state: {self.emotional_state}")
+        self.logger.info(f"Input_emotions: {input_emotions}")
         self.input_emotions = np.array(input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
         self.modifiers = np.zeros((5, 3))
@@ -103,12 +87,14 @@ class Character:
         if self.relationship_status in self.relationship_modifiers:
             # multiply the inputs with the relationship modifier
             self.input_emotions *= self.relationship_modifiers[self.relationship_status]
+            self.logger.info(f"for relationship {self.relationship_status}, relationship modifier with value {self.relationship_modifiers[self.relationship_status]}")
 
         # reapeat for every emotion the bot has (happiness, sadness, etc.)
         for index, emotion in enumerate(self.emotions, start=0):
             # Apply decay_modifier
             # Every emotion automatically reduces by 0.05 per round
             self.modifiers[index][0] = self.decay_modifiers_values[index]
+            self.logger.info(f"for emotion {emotion}, decay modifier with value {self.decay_modifiers_values[index]}")
 
             # apply empathy modifier
             # repeat for every emotion again, cause every emotion can have an infuence on all other emotions
@@ -117,6 +103,7 @@ class Character:
                 self.current_emotion_empathy_modifiers[i] = self.linear_function(self.input_emotions[i], function)
             # sava the sum of all the single empathy mods in the modifier-array
             self.modifiers[index][1] = sum(self.current_emotion_empathy_modifiers)
+            self.logger.info(f"for emotion {emotion}, empathy modifier with summed value {self.modifiers[index][1]}")
 
             # apply state modifier
             # get the state_modifiers for this emotion (outer loop)
@@ -128,15 +115,20 @@ class Character:
                     self.current_state_modifiers[i] = 1
             # berechne den duchschnitt der state modifier
             self.state_modifier_mean = np.mean(self.current_state_modifiers)
+            self.logger.info(f"for emotion {emotion}, state modifier with mean value {self.state_modifier_mean}")
             # Multipiliere alle modifier (input, decay, etc.) mit dem durchschnitt des state modifiers für diese emotion
             # Die emotionen die nicht über dem threshold sind, haben hier keinen einfluss, weil sie auf 1 gesetzt wurden
             # d.h. bei der berechnung des durchschnitts wurden sie quasi schon rausgerechnet
             self.modifiers[index] = self.modifiers[index] * self.state_modifier_mean
 
         # calculate the new emotional state
+
         self.emotional_state_old = self.emotional_state.copy()
         # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
+
+        self.logger.info(f"Summed modifiers: {np.sum(self.modifiers, 1)}")
+
 
         # apply delta modifier
         # delete the first element because we only need the deltas of the nagitive emotions
@@ -148,6 +140,7 @@ class Character:
         if self.mean_delta < 0:
             # add the value of the delta function to the happiness value
             self.emotional_state[0] += self.linear_function(self.mean_delta, self.delta_function)
+            self.logger.info(f"delta modifier: {self.linear_function(self.mean_delta, self.delta_function)}")
 
         # check if all emotions are in range of trait and max values
         for index, value in enumerate(self.emotional_state, start=0):
@@ -162,6 +155,8 @@ class Character:
         # inserts emotional state at position 0 on axis 0 into emotional_history
         self.emotional_history = np.insert(self.emotional_history, 0, self.emotional_state, 0)
         self.emotional_history = np.delete(self.emotional_history, 5, 0)
+
+        self.logger.info(f"new emotional state: {self.emotional_state}")
 
         return self.emotional_state, self.emotional_history
 
@@ -183,79 +178,7 @@ class Character:
         pass
 
     def get_emotional_state(self):
-        self.logger.info("get emo state")
         return self.emotional_state
 
     def get_emotional_history(self):
-        self.logger.info("get emo history")
         return self.emotional_history
-
-# sentiment analysis
-# liu et al 2003
-# (SVOO-Modell) wandelt einen OMCS-Satz in Frame und zugehörigen Vektor um. Frame enthält alle für die Aussagen des Satzes relevanten Wörter
-# und der Vektor beschreibt den in diesem Satz ausgedrückten Affekt (Bsp.: (happy: 0, sad: 0, anger: 0, fear: 1.0, disgust: 0, surprise: 0)
-
-# stimmungen
-# emotionen
-
-# Kategoriale Ansätze:
-# Differentielle Emotiontheorie:
-# 1. von Interesse zu Erregung
-# 2. von Vergnügen zu Freude
-# 3. von Überraschung zu Schreck
-# 4. von Kummer zu Schmerz
-# 5. von Zorn zu Wut
-# 6. von Ekel zu Abscheu
-# 7. von Geringschätzung zu Verachtung
-# 8. von Furcht zu Entsetzen
-# 9. von Scham/Schüchernheit zu Erniedrigung
-# 10. von Schuldgefühle zu Reue
-#
-# Man unterscheidet zwischen dem Zustand und der Eigenschaft einer EmotionIzard (1999), f..
-# Emotionszustände dauern Sekunden bis Stunden und meinen das tatsächliche, jetzige Erleben dieser Emotion.
-# Eine Emotionseigenschaft ist die Veranlagung eines Individuums ein bestimmtes Gefühl regelmäßig und wiederholt
-# zu erleben (denke: Jähzorn).
-#
-# Ekman bestimmte Freude, Traurigkeit, Überraschung, Ekel, Furcht und Wut als Grundemotionen
-# (Angst und Überrasschung und Ekel und Verachtung werden beizeiten zusammengefasst).
-#
-# Traurigkeit, Freude, Angst und Ärger in allen fünf Studien benannt wurdenSchmidt-Atzert
-# (1996)Brandstätter et al. (2013, S. 132 f.). Ekel, Scham, Zuneigung und Überraschung kamen nur vereinizelt vor.
-#
-# Dimensionaler Ansatz:
-# drei bipolare Dimensionen auf: Lust-Unlust, Erregung-Beruhigung und Spannung-Lösung. Die Lust-Unlust-Skala
-# beschreibt die Qualität der Emotion, ob sie also als eher positiv oder eher negativ erlebt wird. Auf die
-# Erregung-Beruhigung-Skala wird die erlebte Intensität der Emotion aufgetragen. Diese beiden Dimensionen
-# einer Emotion ließen sich empirisch wiederholt bestätigen, die Spannug-Lösung-Dimension nur in einzelnen Fällen.
-#
-#
-# persönlichkeit
-# OCEAN-Modell, ordnet Menschen verschiedenen Persönlichkeitstypen zu: Offenheit (gegenüber neuen Erfahrungen),
-# Gewissenhaftigkeit, Extraversion, Verträglichkeit und Neurotizismus
-#
-# ich baue meine persönlichkeit am besten nach wilson (2000) mit ein bissl eismann
-# Wenn es eine vorübergehende Emotion gibt, wird das Verhalten, beziehungsweise die Motivation, daraus berechnet.
-# Gibt es zur Zeit keine Reaktion wird dazu die Stimmung genutzt. Liegen vorübergehende Emotion und Stimmung unter
-# einem bestimmten Schwellenwert, bestimmt die Persönlichkeit das Verhalten.
-# Das personality-Modul enthält die mathematische Beschreibung der Persönlichkeit des Carakters. Sie wird über eine
-# Kugel in einem dreidimensionalen mathematischen Raum bestimmtWilson (2000, S. 82). Die Achsen beschreiben je ein
-# Persönlichkeitsmerkmal, extroversion, fear und aggression. Ein Persönlichkeitsmerkmal ist ein Punkt in diesem Raum.
-# Das Merkmal anxiety beispielsweise liegt bei (E: -30, F: 70, A: -10). Um alle Persönlichkeitsmerkmale eines
-# Charkaters wird eine Kugel gespannt, die dann die gesamte Persönlichkeit ausmacht.
-# Stimmungen werden im mood-Module berechnet gespeichert. Sie werden durch die Persönlichkeit beeinflusstWilson (2000, S. 83).
-# Hat der Persönlichkeitspunkt, der Mittelpunkt der Kugel um alle Persönlichkeitsmerkmale, einen hohen E-Wert, können auch
-# positive Stimmungen einen höheren Wert annehmen. ein hoher F–Wert ermöglicht hohe Werte von negativen Emotionen und der A-Wert
-# bestimmt wie schnell sich diese Stimmungen aufbauen und wieder verfliegen können. Ein Charakter, der sehr hohe Wert in allen
-# drei Dimensionen hat, kann starke positive und negative Stimmungen haben, die sich aber sehr schnell ändern können, wie bei
-# einem Menschen mit starken Stimmungsschwankungen.
-# Stimmungen entwickeln sich hier durch kumulierte emotionale Zustände
-#
-# EISMAN et al
-# Eisman et al. haben es sich im Rahmen eines Forschungsprojektes, das die Entwicklung eines virtuellen Patienten zur Ausbildung
-# von Medizinstudenten zum Ziel hatte, zur Aufgabe gemacht, ein emotional state control system zu entwickelnEisman et al. (2009, S. 9698).
-# Dieses System basiert auf zwei Faktoren: Dem emotionalen Zustand eines Konversationsagenten und seiner Persönlichkeit. Ein emotionaler
-# Zustand besteht aus der spezifischen Zusammensetzung aller Werte (jeweils zwischen 0 und 1) der acht emotionalen Attribute
-# (Freude, Verachtung, Wut, Angst, Sorge, Überrasschung, Trauer, Scham)Eisman et al. (2009, S. 9701). Die Persönlichkeit wird über die
-# gleichen Attribute bestimmt, die in diesem Fall aber statisch sind.
-
-# stichwörter die hier noch reinmüssen: congruency (trait/mood)

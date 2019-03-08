@@ -1,3 +1,4 @@
+import inspect
 import tkinter as tk
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,16 +7,17 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg as FigureCanvas
 matplotlib.use('TkAgg')
 
+
 class Frame:
+    # initialize class instance
     def __init__(self, chatbot_name, bot, character, init_emotional_state, init_emotional_history):
         # initialise variables
         self.chatbot_name = chatbot_name
-        self.bot = bot
-        self.character = character
         self.user_input = None
 
-        self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
         # initialize all ui elements
+
+        self.dgm = DiagramManager(init_emotional_state, init_emotional_history)
         self.root = tk.Tk()
         self.menubar = tk.Menu()
         self.file_menu = tk.Menu(tearoff=0)
@@ -74,13 +76,6 @@ class Frame:
         self.info_label.grid(row=2, column=4, sticky=tk.E)
         self.diagram_canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-    # lets other classes register themselves as observers
-    def register_subscriber(self, who):
-        # Set of subscribers, there should only ever be the controller in there
-        self.subscribers.add(who)
-        # Controller class, only class this one here is allowed to talk to
-        self.controller = who
-
     # forwards user interaction with the gui to the controller
     def forward_user_intent(self, intent, user_input=None, character=None):
         self.controller.handle_intent(intent=intent, input_message=user_input, character=character)
@@ -98,24 +93,42 @@ class Frame:
         self.chat_out.configure(state="disabled")
 
     # prints to the log widget, used to display additional text data (sentiment etc)
-    def update_log(self, output):
-        # unlock widget, insert, lock widget
+    def update_log(self, output_list, clear=True):
         self.log.configure(state="normal")
-        self.log.delete(1.0, tk.END)
-        for item in output:
-            self.log.insert(tk.END, item + "\n")
-        self.log.configure(state="disabled")
+        if clear:
+            self.log.delete(1.0, tk.END)
+
+        # method expects dicts/lists/normal variables in a list and prints them
+        for item in output_list:
+            print(type(item))
+            if isinstance(item, dict):
+                for key, value in item.items():
+                    self.log.insert(tk.END, key + ":\n")
+                    self.log.insert(tk.END, value.__str__() + "\n\n")
+
+            else:
+                self.log.insert(tk.END, item.__str__() + "\n\n")
+
+        self.log.config(state="disabled")
+
 
     # updates diagrams with new values
     def update_diagrams(self, emotional_state, emotional_history):
         self.dgm.update_time_chart(emotional_history, self.diagram_canvas)
         self.dgm.update_bar_chart(self.dgm.ax3, emotional_state, emotional_history, self.diagram_canvas)
 
+    # lets other classes register themselves as observers
+    def register_subscriber(self, who):
+        # Set of subscribers, there should only ever be the controller in there
+        self.subscribers.add(who)
+        # Controller class, only class this one here is allowed to talk to
+        self.controller = who
+
     # draws the ui
     def show(self):
         self.root.mainloop()
 
-# TODO hier die methode so modifizieren, dass die diagramme nach dem dict "visible_diagrams" aufgebaut werden
+
 class DiagramManager:
     def __init__(self, init_emotional_state, init_emotional_history):
         # Data that is needed to make the diagrams (labels, ticks, colors, etc)
