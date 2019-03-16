@@ -12,8 +12,10 @@ import logging
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
+        cm = Character_Manager("character_irascible")
+
         # set up logging
-        logging.basicConfig(level=logging.INFO, filename='app.log', format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
+        logging.basicConfig(level=logging.INFO, filename='app.log', filemode="w", format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
         self.logger = logging.getLogger("controller")
         self.logger.setLevel(logging.INFO)
 
@@ -49,7 +51,6 @@ class Controller:
 
     # takes the users intent (per gui interaction) and starts the corresponding methods
     def handle_intent(self, intent, input_message=None, character=None):
-        self.logger.info("bi")
         if intent == "load_character":
             self.character.load(character)
             self.frame.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())
@@ -84,7 +85,3 @@ class Controller:
 
 
 controller = Controller()
-
-# for key, item in active_diagrams.items():
-#    print(key)
-#    print(item)

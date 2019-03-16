@@ -100,17 +100,14 @@ class Frame:
 
         # method expects dicts/lists/normal variables in a list and prints them
         for item in output_list:
-            print(type(item))
             if isinstance(item, dict):
                 for key, value in item.items():
                     self.log.insert(tk.END, key + ":\n")
                     self.log.insert(tk.END, value.__str__() + "\n\n")
-
             else:
                 self.log.insert(tk.END, item.__str__() + "\n\n")
 
         self.log.config(state="disabled")
-
 
     # updates diagrams with new values
     def update_diagrams(self, emotional_state, emotional_history):
@@ -121,7 +118,6 @@ class Frame:
     def register_subscriber(self, who):
         # Set of subscribers, there should only ever be the controller in there
         self.subscribers.add(who)
-        # Controller class, only class this one here is allowed to talk to
         self.controller = who
 
     # draws the ui

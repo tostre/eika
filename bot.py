@@ -49,7 +49,6 @@ class Bot:
         return self.response_package, self.bot_state_package
 
     def respond_debug(self, user_message):
-        print("debug response")
         if user_message == "h":
             self.response_package = {
                 "response": "Debug input: h",

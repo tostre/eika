@@ -1,26 +1,10 @@
-# Idee: Der Charakter wird definiert durch:
-# 1. Die emo-listen (traits, max_val, act_val
-# 2. Welcher state-Wert durch welche anderen Werte beeinflusst wird
-# 3. Die Beziehung zu einem anderen Menschen (das beeinflusst welcher
-#    Input-Wert welchen emo-Wert wie beeinflusst
-# Bsp: Wenn ich jemanden kenne und ich bekomme eine traurige Nachricht,
-# werde ich auch traurig. Wenn ich ihn incht kenne, ist mir das egal
 import numpy as np
 import logging
-import timeit
 
-
-
-
-# default characters:
-# stable character
-# reactive/empathatic character
-# jähzornig
 
 class Character:
     # constructs a character instance
     def __init__(self, emotions, first_launch):
-        self.log = logging.getLogger(__name__)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
         self.emotions = emotions
@@ -46,7 +30,8 @@ class Character:
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status").item()
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
-        self.log.info(f"Session start. {file} restored")
+        self.reset_bot()
+        self.logger.info(f"Session start. {file} loaded")
 
     # saves the current character in a npz file
     def save(self):
@@ -69,7 +54,7 @@ class Character:
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
-        self.log.info("Character state reset")
+        self.logger.info("Character state reset")
 
     # updates internal emotional state/history based on input emotions
     def update_emotional_state(self, input_emotions):
@@ -100,9 +85,12 @@ class Character:
             # repeat for every emotion again, cause every emotion can have an infuence on all other emotions
             for i, function in enumerate(self.empathy_functions[index], start=0):
                 # save all the influences on the currently checked emotion (outer loop) in an array
+                self.function = function
+                self.a = self.empathy_functions[index]
                 self.current_emotion_empathy_modifiers[i] = self.linear_function(self.input_emotions[i], function)
             # sava the sum of all the single empathy mods in the modifier-array
             self.modifiers[index][1] = sum(self.current_emotion_empathy_modifiers)
+            self.logger.info(f"for emotion {emotion}, empath functions {self.empathy_functions}")
             self.logger.info(f"for emotion {emotion}, empathy modifier with summed value {self.modifiers[index][1]}")
 
             # apply state modifier
@@ -122,7 +110,6 @@ class Character:
             self.modifiers[index] = self.modifiers[index] * self.state_modifier_mean
 
         # calculate the new emotional state
-
         self.emotional_state_old = self.emotional_state.copy()
         # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
@@ -167,18 +154,17 @@ class Character:
         self.function_result = (function[0] * x) + function[1]
 
         # check if function result is within min (threshold) and max value
-        if abs(self.function_result) <= function[2]:
+        if abs(self.function_result) <= function[2] or x == 0:
             return 0
         elif abs(self.function_result) >= function[3]:
             return function[3]
         else:
             return self.function_result
 
-    def linear_function_two(self, x, function):
-        pass
-
+    # Returns the current emotional state
     def get_emotional_state(self):
         return self.emotional_state
 
+    # Returns the emotional history
     def get_emotional_history(self):
         return self.emotional_history

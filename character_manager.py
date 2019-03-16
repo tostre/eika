@@ -22,8 +22,8 @@ class Character_Manager:
 
         self.save(type)
 
-    def save(self, type):
-        np.savez(type,
+    def save(self, file):
+        np.savez(file,
                  trait_values=self.trait_values,
                  max_values=self.max_values,
                  emotional_state=self.emotional_state,
@@ -96,32 +96,32 @@ class Character_Manager:
 
     def get_irascible_character(self):
         # h s a f d
-        self.trait_values = [0.000, 0.000, 0.500, 0.000, 0.000]
-        self.max_values = [0.700, 0.700, 1.000, 0.700, 0.700]
+        self.trait_values = [0.000, 0.000, 0.200, 0.000, 0.000]
+        self.max_values = [0.500, 0.700, 1.000, 0.700, 0.700]
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.05, -0.05, -0.01, -0.05, -0.05])
+        self.decay_modifiers_values = np.array([-0.1, -0.05, -0.01, -0.05, -0.05])
         # empathy mod
         self.empathy_functions = np.array([
-            [[0.10, 0, 0, 1], [-0.1, 0, 0, 1], [-0.05, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1]],
-            [[-0.10, 0, 0.1, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],
-            [[-0.05, 0, 0.1, 1], [0, 0, 0, 1], [0.15, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]],
-            [[-0.01, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],
+            [[0.10, 0.00, 0.00, 0.15], [-0.1, 0, 0, 0.15], [-0.05, 0, 0, 0.15], [-0.05, 0, 0, 0.15], [0, 0, 0, 0.15]],
+            [[-0.1, 0.00, 0.10, 1.00], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],
+            [[-0.05, 0.0, 0.50, 1.00], [0, 0, 0, 1], [0.15, 0.05, 0, 1], [0, 0, 0, 1], [0.05, 0.05, 0, 1]],
+            [[-0.01, 0, 0, 0.01], [0, 0, 0, 0.01], [0.01, 0, 0, 0.01], [0.05, 0, 0, 0.01], [0.05, 0, 0, 0.01]],
             [[-0.1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]
         ])
         # state modifier related variables
         self.state_modifiers_threshold = 0.75
         self.state_modifiers_values = [
-            [1, 1, 1, 1, 1],  # lines show the emotion being influenced (happiness)
-            [1, 1, 1, 1, 1],  # sadness
-            [1, 1, 1, 1, 1],  # anger
-            [1, 1, 1, 1, 1],  # fear
-            [1, 1, 1, 1, 1]  # disgust
+            [1.0, 0.9, 0.7, 1.0, 1.0],  # lines show the emotion being influenced (happiness)
+            [0.9, 1.0, 0.7, 1.0, 1.0],  # sadness
+            [1.0, 1.0, 1.5, 1.0, 1.2],  # anger
+            [0.9, 1.0, 0.7, 1.0, 1.0],  # fear
+            [0.9, 1.0, 1.0, 1.0, 1.0]  # disgust
         ]
         # delta mod realated variables
-        self.delta_function = [-0.1, 0, 0, 1]
+        self.delta_function = [-0.05, 0, 0, 1]
 
     def get_default_character(self):
         self.trait_values = [0.100, 0.100, 0.100, 0.100, 0.100]
