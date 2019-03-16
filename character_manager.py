@@ -23,7 +23,7 @@ class Character_Manager:
         self.save(type)
 
     def save(self, file):
-        np.savez(file,
+        np.savez("characters/" + file,
                  trait_values=self.trait_values,
                  max_values=self.max_values,
                  emotional_state=self.emotional_state,
@@ -39,7 +39,7 @@ class Character_Manager:
     def get_stable_character(self):
         # h s a f d
         self.trait_values = [0.100, 0.000, 0.000, 0.000, 0.000]
-        self.max_values = [0.800, 0.800, 0.800, 0.800, 0.800]
+        self.max_values = [0.900, 0.800, 0.800, 0.800, 0.800]
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
@@ -67,7 +67,7 @@ class Character_Manager:
 
     def get_empathetic_character(self):
         # h s a f d
-        self.trait_values = [0.100, 0.000, 0.000, 0.000, 0.000]
+        self.trait_values = [0.150, 0.150, 0.150, 0.150, 0.150]
         self.max_values = [1.00, 1.000, 1.000, 1.000, 1.000]
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
@@ -112,7 +112,7 @@ class Character_Manager:
             [[-0.1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]
         ])
         # state modifier related variables
-        self.state_modifiers_threshold = 0.75
+        self.state_modifiers_threshold = 0.55
         self.state_modifiers_values = [
             [1.0, 0.9, 0.7, 1.0, 1.0],  # lines show the emotion being influenced (happiness)
             [0.9, 1.0, 0.7, 1.0, 1.0],  # sadness

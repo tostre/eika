@@ -18,7 +18,7 @@ class Character:
 
     # loads character variables from a npz file
     def load(self, file):
-        self.character_npz = np.load(file + ".npz")
+        self.character_npz = np.load("characters/" + file + ".npz")
         self.trait_values = self.character_npz.get("trait_values")
         self.max_values = self.character_npz.get("max_values")
         self.emotional_state = self.character_npz.get("emotional_state")
@@ -35,7 +35,7 @@ class Character:
 
     # saves the current character in a npz file
     def save(self):
-        np.savez("character_saved",
+        np.savez("characters/character_saved",
                  trait_values=self.trait_values,
                  max_values=self.max_values,
                  emotional_state=self.emotional_state,
@@ -58,7 +58,7 @@ class Character:
 
     # updates internal emotional state/history based on input emotions
     def update_emotional_state(self, input_emotions):
-        self.logger.info(f"old emotional state: {self.emotional_state}")
+        self.logger.info(f"------ old emotional state: {self.emotional_state}")
         self.logger.info(f"Input_emotions: {input_emotions}")
         self.input_emotions = np.array(input_emotions)
         # Speichert die insgesamten modifier für die 5 Emotionen, Zeilen = Emotionen, Spalten = mods
@@ -90,8 +90,8 @@ class Character:
                 self.current_emotion_empathy_modifiers[i] = self.linear_function(self.input_emotions[i], function)
             # sava the sum of all the single empathy mods in the modifier-array
             self.modifiers[index][1] = sum(self.current_emotion_empathy_modifiers)
-            self.logger.info(f"for emotion {emotion}, empath functions {self.empathy_functions}")
-            self.logger.info(f"for emotion {emotion}, empathy modifier with summed value {self.modifiers[index][1]}")
+            #self.logger.info(f"for emotion {emotion}, empath functions {self.empathy_functions}")
+            #self.logger.info(f"for emotion {emotion}, empathy modifier with summed value {self.modifiers[index][1]}")
 
             # apply state modifier
             # get the state_modifiers for this emotion (outer loop)
@@ -143,7 +143,7 @@ class Character:
         self.emotional_history = np.insert(self.emotional_history, 0, self.emotional_state, 0)
         self.emotional_history = np.delete(self.emotional_history, 5, 0)
 
-        self.logger.info(f"new emotional state: {self.emotional_state}")
+        self.logger.info(f"------ new emotional state: {self.emotional_state}")
 
         return self.emotional_state, self.emotional_history
 

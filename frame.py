@@ -10,9 +10,10 @@ matplotlib.use('TkAgg')
 
 class Frame:
     # initialize class instance
-    def __init__(self, chatbot_name, bot, character, init_emotional_state, init_emotional_history):
+    def __init__(self, chatbot_name, username, init_emotional_state, init_emotional_history):
         # initialise variables
         self.chatbot_name = chatbot_name
+        self.username = username
         self.user_input = None
 
         # initialize all ui elements
@@ -84,7 +85,7 @@ class Frame:
     def update_chat_out(self, user_input, response):
         # prints input, empties input field
         self.chat_out.configure(state="normal")
-        self.chat_out.insert(tk.END, "Du: " + user_input + "\n")
+        self.chat_out.insert(tk.END, self.username + ": " + user_input + "\n")
         # deletes text from index 0 till the end in input filed
         self.chat_in.delete(0, tk.END)
         # inserts chatbot answer in chat
@@ -152,8 +153,8 @@ class DiagramManager:
 
         # TODO hier damit ansetzen (siehe letztes todo)
         # create diagrams according to the visible diagrams
-        self.make_bar_chart(self.ax3, init_emotional_state, init_emotional_history, "bot emotional state")
-        self.make_time_chart(self.ax4, init_emotional_history, "bot emotional state history")
+        self.make_bar_chart(self.ax3, init_emotional_state, init_emotional_history, "emotional state")
+        self.make_time_chart(self.ax4, init_emotional_history, "emotional history")
         self.fig.set_tight_layout(True)
 
     def get_diagrams(self):
@@ -174,9 +175,8 @@ class DiagramManager:
         ax.bar(self.labels, history_data[1], width=.01, color=self.plot_colors_previous_step, alpha=1)
 
     def update_bar_chart(self, ax, emotional_state, history_data, canvas):
-
         ax.clear()
-        self.make_bar_chart(ax, emotional_state, history_data, "bot emotional state")
+        self.make_bar_chart(ax, emotional_state, history_data, "emotional state")
         canvas.draw()
 
     # create and update a line chart

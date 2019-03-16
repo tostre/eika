@@ -12,10 +12,13 @@ import logging
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
+        cm = Character_Manager("character_default")
+        cm = Character_Manager("character_stable")
+        cm = Character_Manager("character_empathetic")
         cm = Character_Manager("character_irascible")
 
         # set up logging
-        logging.basicConfig(level=logging.INFO, filename='app.log', filemode="w", format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
+        logging.basicConfig(level=logging.INFO, filename='logs/app.log', filemode="w", format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
         self.logger = logging.getLogger("controller")
         self.logger.setLevel(logging.INFO)
 
@@ -23,6 +26,7 @@ class Controller:
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         self.botname = self.config.get("default", "botname")
+        self.username = self.config.get("default", "username")
 
         # initialize chat variables
         self.response_package = None
@@ -41,7 +45,7 @@ class Controller:
         self.bot = Bot(self.botname, self.character, self.classifier)
 
         # create frame and update widgets with initial values
-        self.frame = Frame(self.botname, self.bot, self.character, self.bot.get_emotional_state(), self.bot.get_emotional_history())
+        self.frame = Frame(self.botname, self.username, self.bot.get_emotional_state(), self.bot.get_emotional_history())
         self.frame.register_subscriber(self)
         self.frame.show()
 
