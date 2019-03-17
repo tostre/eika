@@ -157,9 +157,6 @@ class DiagramManager:
         self.make_time_chart(self.ax4, init_emotional_history, "emotional history")
         self.fig.set_tight_layout(True)
 
-    def get_diagrams(self):
-        return self.fig
-
     # create and update a bar chart
     def make_bar_chart(self, ax, bar_data, history_data, title):
         ax.set_title(title)
@@ -173,11 +170,6 @@ class DiagramManager:
 
         ax.bar(self.labels, bar_data, width=.9, color=self.plot_colors, alpha=.75)
         ax.bar(self.labels, history_data[1], width=.01, color=self.plot_colors_previous_step, alpha=1)
-
-    def update_bar_chart(self, ax, emotional_state, history_data, canvas):
-        ax.clear()
-        self.make_bar_chart(ax, emotional_state, history_data, "emotional state")
-        canvas.draw()
 
     # create and update a line chart
     def make_time_chart(self, ax, init_time_data, title):
@@ -196,14 +188,6 @@ class DiagramManager:
         # Legende erstellen
         ax.legend((self.time_plot1, self.time_plot2, self.time_plot3, self.time_plot4, self.time_plot5), self.plot_classes, loc=2)
 
-    def update_time_chart(self, time_data, diagram_canvas):
-        self.time_plot1.set_ydata([time_data[i][0] for i in range(0, 5)])
-        self.time_plot2.set_ydata([time_data[i][1] for i in range(0, 5)])
-        self.time_plot3.set_ydata([time_data[i][2] for i in range(0, 5)])
-        self.time_plot4.set_ydata([time_data[i][3] for i in range(0, 5)])
-        self.time_plot5.set_ydata([time_data[i][4] for i in range(0, 5)])
-        diagram_canvas.draw()
-
     # create and update a radar chart
     def make_radar_chart(self, ax, title, position, polar_data):
         # Erstelle radar chart
@@ -217,12 +201,28 @@ class DiagramManager:
         self.polar_plot, = ax.plot(self.polar_angles, polar_data, alpha=1, linewidth=5)
         ax.fill(self.polar_angles, polar_data, color='blue', alpha=0.1)
 
+    def update_bar_chart(self, ax, emotional_state, history_data, canvas):
+        ax.clear()
+        self.make_bar_chart(ax, emotional_state, history_data, "emotional state")
+        canvas.draw()
+
+    def update_time_chart(self, time_data, diagram_canvas):
+        self.time_plot1.set_ydata([time_data[i][0] for i in range(0, 5)])
+        self.time_plot2.set_ydata([time_data[i][1] for i in range(0, 5)])
+        self.time_plot3.set_ydata([time_data[i][2] for i in range(0, 5)])
+        self.time_plot4.set_ydata([time_data[i][3] for i in range(0, 5)])
+        self.time_plot5.set_ydata([time_data[i][4] for i in range(0, 5)])
+        diagram_canvas.draw()
+
     def update_radar_chart(self, new_data, canvas):
         new_data[0].append(new_data[0][0])
         new_data[1].append(new_data[1][0])
         self.polar_plot.set_data(new_data[0], new_data[1])
         self.polar_plot.set_xdata(new_data[0])
         canvas.draw()
+
+    def get_diagrams(self):
+        return self.fig
 
     # old methods
     def old(self):

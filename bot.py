@@ -98,7 +98,7 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: n",
                 "response_confidence": 100,
-                "input_emotions": [0.10, 0.00, 0.00, 0.00, 0.00],
+                "input_emotions": [0.00, 0.00, 0.00, 0.00, 0.00],
                 "input_topics": [0.00, 0.00, 0.00, 0.00, 0.00],
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))

@@ -113,15 +113,21 @@ class Character:
         self.emotional_state_old = self.emotional_state.copy()
         # addiere den aktuellen emo_state mit den addierten modifiern pro emotion (je eine zeile)
         self.emotional_state = self.emotional_state_old + np.sum(self.modifiers, 1)
-
         self.logger.info(f"Summed modifiers: {np.sum(self.modifiers, 1)}")
 
+        # check if all emotions are in range of trait and max values
+        self.emotional_state = self.clean_state(self.emotional_state)
 
         # apply delta modifier
         # delete the first element because we only need the deltas of the nagitive emotions
         self.deltas = np.delete(self.emotional_state - self.emotional_state_old, 0)
+        print(self.emotional_state)
+        print(self.emotional_state_old)
+        print(self.deltas)
+        print(self.delta_function)
         # calc the mean of the deltas
         self.mean_delta = np.mean(self.deltas)
+        print(np.mean(self.deltas))
         # check if the mean is below zero, ie the negative emotions shrunk
         # TODO bei der Delta-Funktion kommen glaube ich immer positive Zahlen raus, ist das richtig so?
         if self.mean_delta < 0:
@@ -130,14 +136,8 @@ class Character:
             self.logger.info(f"delta modifier: {self.linear_function(self.mean_delta, self.delta_function)}")
 
         # check if all emotions are in range of trait and max values
-        for index, value in enumerate(self.emotional_state, start=0):
-            if value < self.trait_values[index]:
-                self.emotional_state[index] = self.trait_values[index]
-            elif value > self.max_values[index]:
-                self.emotional_state[index] = self.max_values[index]
+        self.emotional_state = self.clean_state(self.emotional_state)
 
-        # Round emotional state values so they can be used for further calculations
-        self.emotional_state = np.round(self.emotional_state, 3)
         # update emotional history
         # inserts emotional state at position 0 on axis 0 into emotional_history
         self.emotional_history = np.insert(self.emotional_history, 0, self.emotional_state, 0)
@@ -146,6 +146,18 @@ class Character:
         self.logger.info(f"------ new emotional state: {self.emotional_state}")
 
         return self.emotional_state, self.emotional_history
+
+    # checks max and min value und sets values accordingly and rounds values
+    def clean_state(self, emotional_state):
+        # check if all emotions are in range of trait and max values
+        for index, value in enumerate(emotional_state, start=0):
+            if value < self.trait_values[index]:
+                emotional_state[index] = self.trait_values[index]
+            elif value > self.max_values[index]:
+                emotional_state[index] = self.max_values[index]
+        # Round emotional state values so they can be used for further calculations
+        emotional_state = np.round(self.emotional_state, 3)
+        return emotional_state
 
     # Returns the calculation of a linear function
     def linear_function(self, x, function):

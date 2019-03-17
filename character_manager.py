@@ -47,11 +47,11 @@ class Character_Manager:
         self.decay_modifiers_values = np.array([-0.01, -0.02, -0.01, -0.02, -0.05])
         # empathy mod
         self.empathy_functions = np.array([
-            [[0.10, 0, 0, 1], [-0.1, 0, 0, 1], [-0.05, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1]],
+            [[0.075, 0, 0, 1], [-0.1, 0, 0, 1], [-0.06, 0, 0, 1], [-0.08, 0, 0, 1], [-0.1, 0, 0, 1]],
             [[-0.10, 0, 0.1, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],
-            [[-0.15, 0, 0.1, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0, 0, 0, 1], [0.01, 0, 0, 1]],
-            [[-0.01, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],
-            [[-0.1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]
+            [[-0.15, 0, 0.1, 1], [0, 0, 0, 1], [0.06, 0, 0, 1], [0, 0, 0, 1], [0.01, 0, 0, 1]],
+            [[-0.01, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0.05, 0, 0, 1], [0.07, 0, 0, 1]],
+            [[-0.1, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.2, 0, 0, 1]]
         ])
         # state modifier related variables
         self.state_modifiers_threshold = 0.75
@@ -67,29 +67,29 @@ class Character_Manager:
 
     def get_empathetic_character(self):
         # h s a f d
-        self.trait_values = [0.150, 0.150, 0.150, 0.150, 0.150]
-        self.max_values = [1.00, 1.000, 1.000, 1.000, 1.000]
+        self.trait_values = [0.150, 0.150, 0.10, 0.10, 0.10]
+        self.max_values = [1.00, 1.000, 9.000, 9.000, 9.000]
         self.emotional_state = self.trait_values.copy()
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.01, -0.01, -0.05])
+        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.03, -0.03, -0.1])
         # empathy mod
         self.empathy_functions = np.array([
-            [[0.20, 0, 0, 1], [-0.0, 0, 0, 1], [-0.00, 0, 0, 1], [-0.00, 0, 0, 1], [0, 0, 0, 1]],
-            [[-0.00, 0, 0.1, 1], [0.20, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0, 0, 0, 1]],
+            [[0.12, 0, 0, 1], [-0.0, 0, 0, 1], [-0.10, 0, 0, 1], [-0.10, 0, 0, 1], [-0.05, 0, 0, 1]],
+            [[-0.00, 0, 0.1, 1], [0.12, 0, 0, 1], [0.03, 0, 0, 1], [0.00, 0, 0, 1], [0, 0, 0, 1]],
             [[-0.0, 0, 0.1, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1]],
-            [[-0.0, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0.05, 0, 0, 1], [0.00, 0, 0, 1]],
-            [[-0.0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.1, 0, 0, 1]]
+            [[-0.0, 0, 0, 1], [0, 0, 0, 1], [0.00, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],
+            [[-0.0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.25, 0, 0, 1]]
         ])
         # state modifier related variables
-        self.state_modifiers_threshold = 0.75
+        self.state_modifiers_threshold = 0.9
         self.state_modifiers_values = [
             [1, 1, 1, 1, 1],  # lines show the emotion being influenced (happiness)
             [1, 1, 1, 1, 1],  # sadness
-            [1, 1, 1, 1, 1],  # anger
-            [1, 1, 1, 1, 1],  # fear
-            [1, 1, 1, 1, 1]  # disgust
+            [0.7, 1, 1, 1, 1],  # anger
+            [0.7, 1, 1, 1, 1],  # fear
+            [0.7, 1, 1, 1, 1]  # disgust
         ]
         # delta mod realated variables
         self.delta_function = [-0.5, 0, 0, 1]
@@ -130,14 +130,14 @@ class Character_Manager:
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.01, -0.01, -0.01])
+        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.01, -0.01, -0.1])
         # empathy functions
         self.empathy_functions = np.array([
             [[0.05, 0, 0, 1], [0, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # lines show the emotion being influenced (happiness)
             [[-0.05, 0, 0.1, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1]],  # sadness
             [[-0.05, 0, 0.1, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # anger
             [[0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1], [0.05, 0, 0, 1]],  # fear
-            [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.05, 0, 0, 1]]  # digust
+            [[0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1], [0.2, 0, 0, 1]]  # digust
         ])
         # state modifier related variables
         self.state_modifiers_threshold = 0.75

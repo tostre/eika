@@ -1,0 +1,234 @@
+
+17.03.19 12:32:27 character/INFO - - Session start. character_default loaded
+17.03.19 12:32:43 character/INFO - - Character state reset
+17.03.19 12:32:43 character/INFO - - Session start. character_default loaded
+17.03.19 12:32:46 character/INFO - - ------ old emotional state: [0.1 0.1 0.1 0.1 0.1]
+17.03.19 12:32:46 character/INFO - - Input_emotions: [1.0, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:32:46 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:46 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:46 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:46 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:46 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:46 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:46 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:46 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:46 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:46 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:46 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:46 character/INFO - - Summed modifiers: [ 0.04 -0.01 -0.01 -0.01 -0.01]
+17.03.19 12:32:46 character/INFO - - delta modifier: 0.001999999999999999
+17.03.19 12:32:46 character/INFO - - ------ new emotional state: [0.142 0.1   0.1   0.1   0.1  ]
+
+17.03.19 12:32:49 character/INFO - - ------ old emotional state: [0.142 0.1   0.1   0.1   0.1  ]
+17.03.19 12:32:49 character/INFO - - Input_emotions: [1.0, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:32:49 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:49 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:49 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:49 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:49 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:49 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:49 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:49 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:49 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:49 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:49 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:49 character/INFO - - Summed modifiers: [ 0.04 -0.01 -0.01 -0.01 -0.01]
+17.03.19 12:32:49 character/INFO - - delta modifier: 0.001999999999999999
+17.03.19 12:32:49 character/INFO - - ------ new emotional state: [0.184 0.1   0.1   0.1   0.1  ]
+
+17.03.19 12:32:50 character/INFO - - ------ old emotional state: [0.184 0.1   0.1   0.1   0.1  ]
+17.03.19 12:32:50 character/INFO - - Input_emotions: [0.0, 1.0, 0.0, 0.0, 0.0]
+17.03.19 12:32:50 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:50 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:50 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:50 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:50 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:50 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:50 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:50 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:50 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:50 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:50 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:50 character/INFO - - Summed modifiers: [-0.01  0.04 -0.01 -0.01 -0.01]
+17.03.19 12:32:50 character/INFO - - ------ new emotional state: [0.174 0.14  0.1   0.1   0.1  ]
+
+17.03.19 12:32:52 character/INFO - - ------ old emotional state: [0.174 0.14  0.1   0.1   0.1  ]
+17.03.19 12:32:52 character/INFO - - Input_emotions: [0.0, 1.0, 0.0, 0.0, 0.0]
+17.03.19 12:32:52 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:52 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:52 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:52 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:52 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:52 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:52 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:52 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:52 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:52 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:52 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:52 character/INFO - - Summed modifiers: [-0.01  0.04 -0.01 -0.01 -0.01]
+17.03.19 12:32:52 character/INFO - - ------ new emotional state: [0.164 0.18  0.1   0.1   0.1  ]
+
+17.03.19 12:32:53 character/INFO - - ------ old emotional state: [0.164 0.18  0.1   0.1   0.1  ]
+17.03.19 12:32:53 character/INFO - - Input_emotions: [0.0, 0.0, 1.0, 0.0, 0.0]
+17.03.19 12:32:53 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:53 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:53 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:53 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:53 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:53 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:53 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:53 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:53 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:53 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:53 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:53 character/INFO - - Summed modifiers: [-0.06 -0.01  0.04  0.04 -0.01]
+17.03.19 12:32:53 character/INFO - - ------ new emotional state: [0.104 0.17  0.14  0.14  0.1  ]
+
+17.03.19 12:32:56 character/INFO - - ------ old emotional state: [0.104 0.17  0.14  0.14  0.1  ]
+17.03.19 12:32:56 character/INFO - - Input_emotions: [0.0, 0.0, 1.0, 0.0, 0.0]
+17.03.19 12:32:56 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:32:56 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:32:56 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:32:56 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:32:56 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:32:56 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:32:56 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:32:56 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:32:56 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:32:56 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:32:56 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:32:56 character/INFO - - Summed modifiers: [-0.06 -0.01  0.04  0.04 -0.01]
+17.03.19 12:32:56 character/INFO - - ------ new emotional state: [0.1  0.16 0.18 0.18 0.1 ]
+
+17.03.19 12:33:02 character/INFO - - ------ old emotional state: [0.1  0.16 0.18 0.18 0.1 ]
+17.03.19 12:33:02 character/INFO - - Input_emotions: [0.0, 0.0, 0.0, 1.0, 0.0]
+17.03.19 12:33:02 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:02 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:02 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:02 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:02 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:02 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:02 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:02 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:02 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:02 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:02 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:02 character/INFO - - Summed modifiers: [-0.01  0.04 -0.01  0.04 -0.01]
+17.03.19 12:33:02 character/INFO - - ------ new emotional state: [0.1  0.2  0.17 0.22 0.1 ]
+
+17.03.19 12:33:03 character/INFO - - ------ old emotional state: [0.1  0.2  0.17 0.22 0.1 ]
+17.03.19 12:33:03 character/INFO - - Input_emotions: [0.0, 0.0, 0.0, 1.0, 0.0]
+17.03.19 12:33:03 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:03 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:03 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:03 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:03 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:03 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:03 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:03 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:03 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:03 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:03 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:03 character/INFO - - Summed modifiers: [-0.01  0.04 -0.01  0.04 -0.01]
+17.03.19 12:33:03 character/INFO - - ------ new emotional state: [0.1  0.24 0.16 0.26 0.1 ]
+
+17.03.19 12:33:05 character/INFO - - ------ old emotional state: [0.1  0.24 0.16 0.26 0.1 ]
+17.03.19 12:33:05 character/INFO - - Input_emotions: [0.0, 0.0, 0.0, 0.0, 1.0]
+17.03.19 12:33:05 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:05 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:05 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:05 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:05 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:05 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:05 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:05 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:05 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:05 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:05 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:05 character/INFO - - Summed modifiers: [-0.01 -0.01 -0.01  0.04  0.04]
+17.03.19 12:33:05 character/INFO - - ------ new emotional state: [0.1  0.23 0.15 0.3  0.14]
+
+17.03.19 12:33:06 character/INFO - - ------ old emotional state: [0.1  0.23 0.15 0.3  0.14]
+17.03.19 12:33:06 character/INFO - - Input_emotions: [0.0, 0.0, 0.0, 0.0, 1.0]
+17.03.19 12:33:06 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:06 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:06 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:06 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:06 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:06 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:06 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:06 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:06 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:06 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:06 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:06 character/INFO - - Summed modifiers: [-0.01 -0.01 -0.01  0.04  0.04]
+17.03.19 12:33:06 character/INFO - - ------ new emotional state: [0.1  0.22 0.14 0.34 0.18]
+
+17.03.19 12:33:08 character/INFO - - ------ old emotional state: [0.1  0.22 0.14 0.34 0.18]
+17.03.19 12:33:08 character/INFO - - Input_emotions: [1.0, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:33:08 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:08 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:08 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:08 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:08 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:08 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:08 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:08 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:08 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:08 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:08 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:08 character/INFO - - Summed modifiers: [ 0.04 -0.01 -0.01 -0.01 -0.01]
+17.03.19 12:33:08 character/INFO - - delta modifier: 0.0020000000000000018
+17.03.19 12:33:08 character/INFO - - ------ new emotional state: [0.142 0.21  0.13  0.33  0.17 ]
+
+17.03.19 12:33:09 character/INFO - - ------ old emotional state: [0.142 0.21  0.13  0.33  0.17 ]
+17.03.19 12:33:09 character/INFO - - Input_emotions: [1.0, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:33:09 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:09 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:09 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:09 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:09 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:09 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:09 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:09 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:09 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:09 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:09 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:09 character/INFO - - Summed modifiers: [ 0.04 -0.01 -0.01 -0.01 -0.01]
+17.03.19 12:33:09 character/INFO - - delta modifier: 0.0020000000000000013
+17.03.19 12:33:09 character/INFO - - ------ new emotional state: [0.184 0.2   0.12  0.32  0.16 ]
+
+17.03.19 12:33:10 character/INFO - - ------ old emotional state: [0.184 0.2   0.12  0.32  0.16 ]
+17.03.19 12:33:10 character/INFO - - Input_emotions: [0.1, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:33:10 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:10 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:10 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:10 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:10 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:10 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:10 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:10 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:10 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:10 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:10 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:10 character/INFO - - Summed modifiers: [-0.005 -0.01  -0.01  -0.01  -0.01 ]
+17.03.19 12:33:10 character/INFO - - delta modifier: 0.0020000000000000013
+17.03.19 12:33:10 character/INFO - - ------ new emotional state: [0.181 0.19  0.11  0.31  0.15 ]
+
+17.03.19 12:33:12 character/INFO - - ------ old emotional state: [0.181 0.19  0.11  0.31  0.15 ]
+17.03.19 12:33:12 character/INFO - - Input_emotions: [0.1, 0.0, 0.0, 0.0, 0.0]
+17.03.19 12:33:12 character/INFO - - for relationship neutral, relationship modifier with value 1
+17.03.19 12:33:12 character/INFO - - for emotion happiness, decay modifier with value -0.01
+17.03.19 12:33:12 character/INFO - - for emotion happiness, state modifier with mean value 1.0
+17.03.19 12:33:12 character/INFO - - for emotion sadness, decay modifier with value -0.01
+17.03.19 12:33:12 character/INFO - - for emotion sadness, state modifier with mean value 1.0
+17.03.19 12:33:12 character/INFO - - for emotion anger, decay modifier with value -0.01
+17.03.19 12:33:12 character/INFO - - for emotion anger, state modifier with mean value 1.0
+17.03.19 12:33:12 character/INFO - - for emotion fear, decay modifier with value -0.01
+17.03.19 12:33:12 character/INFO - - for emotion fear, state modifier with mean value 1.0
+17.03.19 12:33:12 character/INFO - - for emotion disgust, decay modifier with value -0.01
+17.03.19 12:33:12 character/INFO - - for emotion disgust, state modifier with mean value 1.0
+17.03.19 12:33:12 character/INFO - - Summed modifiers: [-0.005 -0.01  -0.01  -0.01  -0.01 ]
+17.03.19 12:33:12 character/INFO - - delta modifier: 0.0020000000000000013
+17.03.19 12:33:12 character/INFO - - ------ new emotional state: [0.178 0.18  0.1   0.3   0.14 ]
+17.03.19 12:33:15 character/INFO - - Session end. character_saved saved.
