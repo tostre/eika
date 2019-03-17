@@ -19,7 +19,6 @@ class Character_Manager:
             "neutral": 1,
             "dislike": 0.3
         }
-
         self.save(type)
 
     def save(self, file):
