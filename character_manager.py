@@ -28,7 +28,7 @@ class Character_Manager:
                  emotional_state=self.emotional_state,
                  emotional_history=self.emotional_history,
                  empathy_functions=self.empathy_functions,
-                 decay_modifiers_values=self.decay_modifiers_values,
+                 decay_modifiers=self.decay_modifiers,
                  state_modifiers_values=self.state_modifiers_values,
                  state_modifiers_threshold=self.state_modifiers_threshold,
                  delta_function=self.delta_function,
@@ -43,7 +43,7 @@ class Character_Manager:
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.01, -0.02, -0.01, -0.02, -0.05])
+        self.decay_modifiers = np.array([-0.01, -0.02, -0.01, -0.02, -0.05])
         # empathy mod
         self.empathy_functions = np.array([
             [[0.075, 0, 0, 1], [-0.1, 0, 0, 1], [-0.06, 0, 0, 1], [-0.08, 0, 0, 1], [-0.1, 0, 0, 1]],
@@ -72,7 +72,7 @@ class Character_Manager:
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.03, -0.03, -0.1])
+        self.decay_modifiers = np.array([-0.01, -0.01, -0.03, -0.03, -0.1])
         # empathy mod
         self.empathy_functions = np.array([
             [[0.12, 0, 0, 1], [-0.0, 0, 0, 1], [-0.10, 0, 0, 1], [-0.10, 0, 0, 1], [-0.05, 0, 0, 1]],
@@ -101,7 +101,7 @@ class Character_Manager:
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.1, -0.05, -0.01, -0.05, -0.05])
+        self.decay_modifiers = np.array([-0.1, -0.05, -0.01, -0.05, -0.05])
         # empathy mod
         self.empathy_functions = np.array([
             [[0.10, 0.00, 0.00, 0.15], [-0.1, 0, 0, 0.15], [-0.05, 0, 0, 0.15], [-0.05, 0, 0, 0.15], [0, 0, 0, 0.15]],
@@ -129,7 +129,7 @@ class Character_Manager:
         self.emotional_history = np.zeros((5, 5))
         self.emotional_history[0] = self.emotional_state.copy()
         # decay mod related variables
-        self.decay_modifiers_values = np.array([-0.01, -0.01, -0.01, -0.01, -0.1])
+        self.decay_modifiers = np.array([-0.01, -0.01, -0.01, -0.01, -0.1])
         # empathy functions
         self.empathy_functions = np.array([
             [[0.05, 0, 0, 1], [0, 0, 0, 1], [-0.05, 0, 0, 1], [0, 0, 0, 1], [0, 0, 0, 1]],  # lines show the emotion being influenced (happiness)

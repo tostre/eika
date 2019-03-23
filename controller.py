@@ -12,6 +12,7 @@ import logging
 # this enables the system to be highly modular, every component (classifier, bot, character) can be switched
 class Controller:
     def __init__(self):
+
         cm = Character_Manager("character_default")
         cm = Character_Manager("character_stable")
         cm = Character_Manager("character_empathetic")
@@ -45,7 +46,7 @@ class Controller:
         self.bot = Bot(self.botname, self.character, self.classifier)
 
         # create frame and update widgets with initial values
-        self.frame = Frame(self.botname, self.username, self.bot.get_emotional_state(), self.bot.get_emotional_history())
+        self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
         self.frame.register_subscriber(self)
         self.frame.show()
 
@@ -55,6 +56,7 @@ class Controller:
 
     # takes the users intent (per gui interaction) and starts the corresponding methods
     def handle_intent(self, intent, input_message=None, character=None):
+        print("intent", intent)
         if intent == "load_character":
             self.character.load(character)
             self.frame.update_diagrams(self.character.get_emotional_state(), self.character.get_emotional_history())

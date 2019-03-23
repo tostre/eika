@@ -5,6 +5,7 @@ from tensorflow import keras
 # Helper libraries
 import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 import empath
 import random
@@ -13,7 +14,7 @@ class Classifier:
     def __init__(self, topic_keywords):
         self.lexicon = empath.Empath()
         self.keyword_analysis = []
-        self.emotion_analysis = []
+        self.input_emotions = np.zeros(5)
         self.topic_keywords = topic_keywords
 
     # analyzes and returns topics of the input using empath
@@ -30,10 +31,5 @@ class Classifier:
 
     # atm returns a list of random generated emotion values
     def get_emotions(self, input):
-        self.emotion_analysis = []
-        self.emotion_analysis = [round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2)]
-        return self.emotion_analysis
+        self.input_emotions = np.round(np.random.rand(5), 3)
+        return self.input_emotions

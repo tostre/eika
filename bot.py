@@ -1,6 +1,7 @@
 import chatterbot as cb
 from chatterbot.trainers import ChatterBotCorpusTrainer
 import logging
+import numpy as np
 
 
 # this analyzes user inputs and generates a response
@@ -9,6 +10,7 @@ class Bot:
         # this is so i dont get a minor error message every turn
         logger = logging.getLogger()
         logger.setLevel(logging.CRITICAL)
+
         # identity of the bot
         self.character = character
         self.classifier = classifier
@@ -53,8 +55,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: h",
                 "response_confidence": 100,
-                "input_emotions": [1.00, 0.00, 0.00, 0.00, 0.00],
-                "input_topics": [1.00, 0.00, 0.00, 0.00, 0.00],
+                "input_emotions": np.array([1.00, 0.00, 0.00, 0.00, 0.00]),
+                "input_topics": np.array([1.00, 0.00, 0.00, 0.00, 0.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
@@ -62,8 +64,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: s",
                 "response_confidence": 100,
-                "input_emotions": [0.00, 1.00, 0.00, 0.00, 0.00],
-                "input_topics": [0.00, 1.00, 0.00, 0.00, 0.00],
+                "input_emotions": np.array([0.00, 1.00, 0.00, 0.00, 0.00]),
+                "input_topics": np.array([0.00, 1.00, 0.00, 0.00, 0.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
@@ -71,8 +73,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: a",
                 "response_confidence": 100,
-                "input_emotions": [0.00, 0.00, 1.00, 0.00, 0.00],
-                "input_topics": [0.00, 0.00, 1.00, 0.00, 0.00],
+                "input_emotions": np.array([0.00, 0.00, 1.00, 0.00, 0.00]),
+                "input_topics": np.array([0.00, 0.00, 1.00, 0.00, 0.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
@@ -80,8 +82,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: f",
                 "response_confidence": 100,
-                "input_emotions": [0.00, 0.00, 0.00, 1.00, 0.00],
-                "input_topics": [0.00, 0.00, 0.00, 1.00, 0.00],
+                "input_emotions": np.array([0.00, 0.00, 0.00, 1.00, 0.00]),
+                "input_topics": np.array([0.00, 0.00, 0.00, 1.00, 0.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
@@ -89,8 +91,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: d",
                 "response_confidence": 100,
-                "input_emotions": [0.00, 0.00, 0.00, 0.00, 1.00],
-                "input_topics": [0.00, 0.00, 0.00, 0.00, 1.00],
+                "input_emotions": np.array([0.00, 0.00, 0.00, 0.00, 1.00]),
+                "input_topics": np.array([0.00, 0.00, 0.00, 0.00, 1.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
@@ -98,8 +100,8 @@ class Bot:
             self.response_package = {
                 "response": "Debug input: n",
                 "response_confidence": 100,
-                "input_emotions": [0.00, 0.00, 0.00, 0.00, 0.00],
-                "input_topics": [0.00, 0.00, 0.00, 0.00, 0.00],
+                "input_emotions": np.array([0.00, 0.00, 0.00, 0.00, 0.00]),
+                "input_topics": np.array([0.00, 0.00, 0.00, 0.00, 0.00]),
             }
             self.emotional_state, self.emotional_history = self.character.update_emotional_state(self.response_package.get("input_emotions"))
             self.bot_state_package = {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
