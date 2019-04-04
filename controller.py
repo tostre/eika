@@ -30,8 +30,9 @@ class Controller:
         self.username = self.config.get("default", "username")
 
         # initialize chat variables
-        self.response_package = None
-        self.bot_state_package = None
+        self.ml_package = {}
+        self.response_package = {}
+        self.state_package = {}
         self.log_message = []
 
         # initialize emotional variables
@@ -41,9 +42,9 @@ class Controller:
         self.topic_keywords_neg_sentiment = ["cold", "swearing_terms", "disappointment", "pain", "neglect", "suffering", "negative_emotion", "hate", "rage"]
 
         # create bot, responsible for generating answers and classifier, for analysing the input
-        self.character = Character(self.emotions, self.config.getboolean("default", "firstlaunch"))
+        self.character = Character(self.config.getboolean("default", "firstlaunch"))
         self.classifier = Classifier(self.topic_keywords)
-        self.bot = Bot(self.botname, self.character, self.classifier)
+        self.bot = Bot()
 
         # create frame and update widgets with initial values
         self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
@@ -71,12 +72,14 @@ class Controller:
 
     # take user input, generate new data an update ui
     def handle_input(self, user_message):
-        # get new values based in response
-        self.response_package, self.bot_state_package = self.bot.respond(user_message)
+        # update all modules
+        self.ml_package = self.classifier.get_emotions(user_message)
+        self.response_package = self.bot.respond(user_message)
+        self.state_package = self.character.update_emotional_state(self.ml_package.get("input_emotions"))
         # update gui
         self.frame.update_chat_out(user_message, self.response_package.get("response").__str__())
-        self.frame.update_log([self.bot_state_package, self.response_package])
-        self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
+        self.frame.update_log([self.state_package, self.response_package])
+        self.frame.update_diagrams(self.state_package.get("emotional_state"), self.state_package.get("emotional_history"))
 
     # handles saving data when closing the program
     def save_session(self):

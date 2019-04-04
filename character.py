@@ -4,10 +4,9 @@ import logging
 
 class Character:
     # constructs a character instance
-    def __init__(self, emotions, first_launch):
+    def __init__(self, first_launch):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
-        self.emotions = emotions
         self.character_package = {}
 
         self.emotional_state = np.zeros(5)
@@ -40,6 +39,7 @@ class Character:
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status").item()
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
+
         self.logger.info(f"Session start. {file} loaded")
 
     # saves the current character in a npz file
@@ -88,7 +88,7 @@ class Character:
         self.emotional_state = self.clean_state(self.emotional_state)
         self.emotional_history = np.insert(self.emotional_history[0:-1], 0, self.emotional_state, 0)
 
-        return self.emotional_state, self.emotional_history
+        return {"emotional_state": self.emotional_state, "emotional_history": self.emotional_history}
 
     # Returns value of modifier based on the interaction function between two emotions
     def get_empathy_modifier(self, input_emotions, emotion):
