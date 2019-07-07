@@ -70,11 +70,14 @@ class Controller:
     # take user input, generate new data an update ui
     def handle_input(self, user_message):
         # get new values based in response
-        self.response_package, self.bot_state_package = self.bot.respond(user_message)
+        ###### !!!! zeilen hier drunter nach dem testen wieder auskommentieren !!! ###
+        ##      self.response_package, self.bot_state_package = self.bot.respond(user_message)
         # update gui
-        self.frame.update_chat_out(user_message, self.response_package.get("response").__str__())
-        self.frame.update_log([self.bot_state_package, self.response_package])
-        self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
+        ##      self.frame.update_chat_out(user_message, self.response_package.get("response").__str__())
+        ##      self.frame.update_log([self.bot_state_package, self.response_package])
+        ##      self.frame.update_diagrams(self.bot_state_package.get("emotional_state"), self.bot_state_package.get("emotional_history"))
+
+        self.classifier.get_tokens_nltk(user_message)
 
     # handles saving data when closing the program
     def save_session(self):

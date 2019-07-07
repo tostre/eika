@@ -30,7 +30,6 @@ class Character:
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status").item()
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
-        self.reset_bot()
         self.logger.info(f"Session start. {file} loaded")
 
     # saves the current character in a npz file
