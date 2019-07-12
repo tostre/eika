@@ -2,6 +2,7 @@ from frame import Frame
 from bot import Bot
 from character import Character
 from classifier import Classifier
+from test_class import Test
 from character_manager import Character_Manager
 import configparser
 import logging
@@ -13,10 +14,12 @@ import logging
 class Controller:
     def __init__(self):
 
-        cm = Character_Manager("character_default")
-        cm = Character_Manager("character_stable")
-        cm = Character_Manager("character_empathetic")
-        cm = Character_Manager("character_irascible")
+        # create default personalities
+        cm = Character_Manager()
+        cm.save("character_default")
+        cm.save("character_stable")
+        cm.save("character_empathetic")
+        cm.save("character_irascible")
 
         # set up logging
         logging.basicConfig(level=logging.INFO, filename='logs/app.log', filemode="w", format='%(asctime)s %(name)s/%(levelname)s - - %(message)s', datefmt='%d.%m.%y %H:%M:%S')
@@ -47,9 +50,11 @@ class Controller:
         self.bot = Bot()
 
         # create frame and update widgets with initial values
-        self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
-        self.frame.register_subscriber(self)
-        self.frame.show()
+        #self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
+        #self.frame.register_subscriber(self)
+        #self.frame.show()
+
+        self.test = Test()
 
         # save all session data after the frame is closed
         self.save_session()
