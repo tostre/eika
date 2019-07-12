@@ -2,14 +2,17 @@ import numpy as np
 
 
 class Character_Manager:
-    def __init__(self, type):
-        if type == "character_stable":
+    def __init__(self):
+        pass
+
+    def save(self, file):
+        if file == "character_stable":
             self.get_stable_character()
-        elif type == "character_empathetic":
+        elif file == "character_empathetic":
             self.get_empathetic_character()
-        elif type == "character_irascible":
+        elif file == "character_irascible":
             self.get_irascible_character()
-        elif type == "character_default":
+        elif file == "character_default":
             self.get_default_character()
 
         self.relationship_status = "neutral"
@@ -19,9 +22,7 @@ class Character_Manager:
             "neutral": 1,
             "dislike": 0.3
         }
-        self.save(type)
 
-    def save(self, file):
         np.savez("characters/" + file,
                  trait_values=self.trait_values,
                  max_values=self.max_values,
