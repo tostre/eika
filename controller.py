@@ -50,10 +50,9 @@ class Controller:
         self.bot = Bot()
 
         # create frame and update widgets with initial values
-        #self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
-        #self.frame.register_subscriber(self)
-        #self.frame.show()
-
+        self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
+        self.frame.register_subscriber(self)
+        self.frame.show()
         self.test = Test()
 
         # save all session data after the frame is closed
@@ -79,6 +78,7 @@ class Controller:
     def handle_input(self, user_message):
         # update all modules
         self.ml_package = self.classifier.get_emotions(user_message)
+        print("ml_package", self.ml_package)
         self.response_package = self.bot.respond(user_message)
         self.state_package = self.character.update_emotional_state(self.ml_package.get("input_emotions"))
         # update gui

@@ -38,6 +38,8 @@ class Character:
         self.state_modifiers_threshold = self.character_npz.get("state_modifiers_threshold")
         self.delta_function = self.character_npz.get("delta_function")
         self.relationship_status = self.character_npz.get("relationship_status").item()
+        # In den Dateien format.py und npyio.py des NumbyModules habe ich allow_pickles=True
+        # gesetzt. Andernfalls wird hier ein Fehler geworfen
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
 
         self.logger.info(f"Session start. {file} loaded")

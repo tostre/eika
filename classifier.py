@@ -1,17 +1,6 @@
 import numpy as np
-
 import empath
-
-
-import matplotlib.pyplot as plt
-import nltk
-import empath
-import numpy
 import random
-from nltk.tokenize import sent_tokenize, word_tokenize
-from nltk.corpus import webtext
-from nltk.corpus import stopwords
-
 
 class Classifier:
     def __init__(self, topic_keywords):
@@ -31,7 +20,7 @@ class Classifier:
         else:
             return {
                 "input_emotions": np.round(np.random.rand(5), 3),
-                "input_topics": self.get_topics(user_message)
+                "input_topics": self.get_topics(user_message),
             }
 
     def get_emotions_debug(self, user_message):
@@ -80,13 +69,13 @@ class Classifier:
         pass
 
     # atm returns a list of random generated emotion values
-    def get_emotions(self, input):
-        self.emotion_analysis = []
-        self.emotion_analysis = [round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2),
-                                 round(random.uniform(0, 1), 2)]
-        return self.emotion_analysis
+   # def get_emotions(self, input):
+    #    self.emotion_analysis = []
+     #   self.emotion_analysis = [round(random.uniform(0, 1), 2),
+      #                           round(random.uniform(0, 1), 2),
+       #                          round(random.uniform(0, 1), 2),
+        #                         round(random.uniform(0, 1), 2),
+         #                        round(random.uniform(0, 1), 2)]
+        #xreturn self.emotion_analysis
 
 
