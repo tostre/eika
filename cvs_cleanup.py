@@ -2,11 +2,14 @@ import csv
 
 class Cleaner:
     def __init__(self):
-        #self.datasets = ["crowdflower", "emoint", "emotion_classification", "isear", "meld", "tec"]
-        self.datasets = ["crowdflower"]
+        self.datasets = [["crowdflower", ","], ["emoint", "\t"],
+                         ["emotion_classification", ","],
+                         ["isear", "\t"], ["meld", ","], ["tec", "\t"]]
+        #self.datasets = ["emoint"]
         self.emotions = ["happiness", "sadness", "anger", "fear", "disgust"]
         self.test_emotions = ["neutral", "happiness"]
         self.test_line = ["greeting you all a happy mother's day!", 'happiness']
+
 
         #self.lists_have_common_member(self.emotions, self.test_line)
 
@@ -17,9 +20,9 @@ class Cleaner:
     # replaces any other delimiter with a comma
     def clean_delimiter(self):
         for dataset in self.datasets:
-            with open("korpora/" + dataset + ".csv", "r") as file:
-                reader = csv.reader(file)
-                with open("korpora/" + dataset + "_clean.csv", "w") as new_file:
+            with open("korpora/" + dataset[0] + ".csv", "r") as file:
+                reader = csv.reader(file, delimiter=dataset[1])
+                with open("korpora/" + dataset[0] + "_clean.csv", "w") as new_file:
                     writer = csv.writer(new_file, delimiter=",")
 
                     for line in reader:
