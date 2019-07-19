@@ -38,7 +38,7 @@ class Test:
                  for token in sentence if not token.is_stop],
             sentence.ents]
 
-    def get_features:
+    def get_features(self):
         # Anzahl an Keywords/Affekt-Wörter (emotional getaggte?)
         # Auftauchen und Anzahl (evtl gewichtet)
         # n-Gramme
@@ -49,6 +49,7 @@ class Test:
         # ausrufe/interjektionen
         # Flüche/Beledigungen
         # Diminutive/Augmentative
+        pass
 
 
 

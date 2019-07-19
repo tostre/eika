@@ -27,6 +27,11 @@ class Character:
 
     # loads character variables from a npz file
     def load(self, file):
+        # irgendein update hat die ladefunktion zweschossen. Daher muss ich jetzt
+        # diesen workaround anwenden, damits keinen fehler schmeißt
+        self.np_load_old = self.np.load
+        self.np.load = lambda *a, **k: self.np_load_old(*a, allow_pickle=True, **k)
+        # load characters and values
         self.character_npz = np.load("characters/" + file + ".npz")
         self.trait_values = self.character_npz.get("trait_values")
         self.max_values = self.character_npz.get("max_values")
@@ -43,6 +48,7 @@ class Character:
         self.relationship_modifiers = self.character_npz.get("relationship_modifiers").item()
 
         self.logger.info(f"Session start. {file} loaded")
+        self.np.load = self.np_load_old
 
     # saves the current character in a npz file
     def save(self):

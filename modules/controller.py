@@ -1,9 +1,8 @@
-from frame import Frame
-from bot import Bot
-from character import Character
-from classifier import Classifier
-from test_class import Test
-from character_manager import Character_Manager
+from modules.frame import Frame
+from modules.bot import Bot
+from modules.character import Character
+from modules.classifier import Classifier
+from modules.character_manager import Character_Manager
 import configparser
 import logging
 
@@ -28,7 +27,7 @@ class Controller:
 
         # read config file and save values in variables
         self.config = configparser.ConfigParser()
-        self.config.read("config.ini")
+        self.config.read("config/config.ini")
         self.botname = self.config.get("default", "botname")
         self.username = self.config.get("default", "username")
 
@@ -53,7 +52,6 @@ class Controller:
         self.frame = Frame(self.botname, self.username, self.character.get_emotional_state(), self.character.get_emotional_history())
         self.frame.register_subscriber(self)
         self.frame.show()
-        self.test = Test()
 
         # save all session data after the frame is closed
         self.save_session()

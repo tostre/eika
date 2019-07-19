@@ -11,7 +11,7 @@ class Cleaner:
         self.datasets = [["crowdflower", ","], ["emoint", "\t"],
                          ["emotion_classification", ","],
                          ["isear", "\t"], ["meld", ","], ["tec", "\t"]]
-        # self.datasets = [["crowdflower", ","]]
+        #self.datasets = [["crowdflower", ","]]
 
         self.cleanup_datasets()
 
