@@ -30,7 +30,7 @@ class Cleaner:
                                                    (self.csv_dataset["affect"] == "fear") |
                                                    (self.csv_dataset["affect"] == "disgust")]
             # Reset the index numbers for the rows
-            self.clean_rows.reset_index(inplace=True)
+            self.clean_rows.reset_index(inplace=True, drop=True)
 
             # Delete all rows that contain links or @-mentions
             print("... removing links and mentions")
@@ -45,7 +45,7 @@ class Cleaner:
             self.clean_rows = self.clean_rows[self.drop_rows]
 
             # Save these datasets as a cleaned up corpus with delimiter ","
-            self.clean_rows.drop(columns=["index"], inplace=True)
+            self.clean_rows.reset_index(inplace=True, drop=True)
             self.clean_rows.to_csv("corpora/" + dataset[0] + "_clean.csv", sep=",")
             print("... done\n")
 
