@@ -92,7 +92,7 @@ class Controller:
         # set the first launch variable to false
         self.config.set("default", "firstlaunch", "NO")
         # save new value in file
-        with open("config.ini", "w") as f:
+        with open("config/config.ini", "w") as f:
             self.config.write(f)
 
 
