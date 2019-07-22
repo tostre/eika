@@ -22,7 +22,7 @@ class Csv_tool:
                          ["emotion_classification", ","],
                          ["isear", "\t"], ["meld", ","], ["tec", "\t"]]
         # self.datasets = [["crowdflower", ","]]
-        # self.datasets = [["test", ","]]
+        self.datasets = [["test", ","]]
 
         self.cleanup_datasets()
         self.discern_features()
