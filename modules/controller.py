@@ -1,8 +1,8 @@
-from modules.frame import Frame
-from modules.bot import Bot
-from modules.character import Character
-from modules.classifier import Classifier
-from modules.character_manager import Character_Manager
+from frame import Frame
+from bot import Bot
+from character import Character
+from classifier import Classifier
+from character_manager import Character_Manager
 import configparser
 import logging
 
